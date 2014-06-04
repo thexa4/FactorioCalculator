@@ -18,9 +18,9 @@ namespace FactorioCalculator
         {
             ModImporter a = new ModImporter(@"C:\Users\Max\Documents\Factorio_0.9.8.9400", "base");
             a.Load();
-            
 
-            Console.WriteLine(a.Library);
+
+            Console.WriteLine(a.Library.RecipeChains.Last().Value.First().Waste);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

@@ -14,6 +14,8 @@ namespace FactorioCalculator.Models
         public double FuelValue { get; set; }
         public string SubGroup { get; set; }
         public string PlaceResultName { get; set; }
+
+        public bool IsResource { get; set; }
         public Building PlaceResult
         {
             get
@@ -25,6 +27,14 @@ namespace FactorioCalculator.Models
             set
             {
                 PlaceResultName = value != null ? value.Name : null;
+            }
+        }
+
+        public IEnumerable<Recipe> Recipes
+        {
+            get
+            {
+                return _library.Recipes.Where((r) => r.Results.Where((res) => res.Item == this).Any());
             }
         }
         
@@ -40,6 +50,11 @@ namespace FactorioCalculator.Models
         public void Initialize(Library library)
         {
             _library = library;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("Item<{0}>", Name);
         }
     }
 }

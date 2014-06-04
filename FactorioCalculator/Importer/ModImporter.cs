@@ -61,21 +61,45 @@ namespace FactorioCalculator.Importer
                 Console.WriteLine(String.Join(", ", lua.Globals));
                 LuaTable data = lua["data"] as LuaTable;
                 var raw = data["raw"] as LuaTable;
-                
+                var resources = raw["resource"] as LuaTable;
                 var recipes = raw["recipe"] as LuaTable;
-                var items = raw["item"] as LuaTable;
 
                 var library = new Library();
 
                 foreach (var recipe in ParseRecipes(recipes))
                     library.AddRecipe(recipe);
 
-                foreach (var item in ParseItems(items))
-                    library.AddItem(item);
-
                 foreach (var building in ParseEntities(raw))
                     library.AddBuilding(building);
+
+                foreach (var subtree in new string[] { "item", "fluid", "ammo", "module", "mining-tool", "armor", "capsule", "gun", "blueprint", "deconstruction-item", "repair-tool" })
+                    foreach (var item in ParseItems(raw[subtree] as LuaTable))
+                        library.AddItem(item);
+
+                foreach(var resource in resources.Values.OfType<LuaTable>())
+                {
+                    if (!resource.ContainsKey("minable"))
+                        continue;
+                    var minable = resource["minable"] as LuaTable;
+                    
+                    if (minable.ContainsKey("results"))
+                    {
+                        var items = minable["results"] as LuaTable;
+                        foreach(var item in items.Values.OfType<LuaTable>())
+                            library.Items.Where((i) => i.Name == item["name"] as string).First().IsResource = true;
+                    }
+
+                    if(minable.ContainsKey("result"))
+                    {
+                        var item = minable["result"] as string;
+                        library.Items.Where((i) => i.Name == item).First().IsResource = true;
+                    }
+                }
+
+                Library = library;
             }
+
+            Library.Initialize();
         }
 
         private IEnumerable<Building> ParseEntities(LuaTable entities)

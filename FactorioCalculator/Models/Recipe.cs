@@ -33,6 +33,11 @@ namespace FactorioCalculator.Models
         public void Initialize(Library library)
         {
             _library = library;
+
+            foreach (var i in _ingredients)
+                i.Initialize(library);
+            foreach (var r in _results)
+                r.Initialize(library);
         }
 
         public void AddIngredient(ItemAmount amount)
@@ -55,6 +60,11 @@ namespace FactorioCalculator.Models
         public void RemoveResult(ItemAmount amount)
         {
             _results.Remove(amount);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Recipe<{0}>", Name);
         }
     }
 }

@@ -34,5 +34,10 @@ namespace FactorioCalculator.Models
         {
             _library = library;
         }
+
+        public override string ToString()
+        {
+            return string.Format("ItemAmount<{0}, {1}>", Item, Amount);
+        }
     }
 }

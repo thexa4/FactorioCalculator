@@ -19,12 +19,18 @@ namespace FactorioCalculator.Models
         private List<Building> _buildings = new List<Building>();
         private List<Recipe> _recipes = new List<Recipe>();
 
+        public Dictionary<Item, List<RecipeChain>> RecipeChains { get; private set; }
+
         public void Initialize()
         {
             foreach (var i in _items)
                 i.Initialize(this);
             foreach (var b in _buildings)
                 b.Initialize(this);
+            foreach (var r in _recipes)
+                r.Initialize(this);
+
+            RecipeChains = RecipeChain.InitializeChainDictionary(this);
         }
 
         public void AddItem(Item item)
