@@ -112,10 +112,24 @@ namespace FactorioCalculator.Importer
                             if (source.ContainsKey("effectivity"))
                                 efficiency = (double)source["effectivity"];
 
-                        if (!entity.ContainsKey("energy_usage"))
-                            result.Energy = ParseEnergy(source["drain"] as string) / efficiency;
-                        else
+                        if (entity.ContainsKey("energy_usage"))
+                        {
                             result.Energy = ParseEnergy(entity["energy_usage"] as string) / efficiency;
+                        }
+                        else if (source.ContainsKey("drain"))
+                        {
+                            result.Energy = ParseEnergy(source["drain"] as string) / efficiency;
+                        }
+                        else if(entity.Keys.OfType<string>().Where((s) => s.StartsWith("energy_per_")).Any())
+                        {
+                            string key = entity.Keys.OfType<string>().Where((s) => s.StartsWith("energy_per_")).First();
+                            string energy = entity[key] as string;
+                            if (!string.IsNullOrWhiteSpace(energy))
+                                result.Energy = ParseEnergy(energy);
+                            else
+                                result.Energy = (double)entity[key];
+                        }
+
 
                         Debug.WriteLine("{0}: {1} ({2})", name, result.EnergySource, result.Energy);
                     }
