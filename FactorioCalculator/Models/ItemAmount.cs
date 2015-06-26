@@ -10,14 +10,13 @@ namespace FactorioCalculator.Models
     [Serializable]
     class ItemAmount
     {
-        public double Amount { get; set; }
+        public double Amount { get; protected set; }
         public Item Item
         {
             get { return _library.Items.Where((i) => i.Name == _itemName).First(); }
-            set { _itemName = value.Name; }
         }
 
-        private string _itemName;
+        private readonly string _itemName;
 
         [NonSerialized]
         private Library _library;

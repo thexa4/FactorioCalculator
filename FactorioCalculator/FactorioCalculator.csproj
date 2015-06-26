@@ -80,6 +80,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -99,10 +102,19 @@
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helper\LuaTableExtensions.cs" />
+    <Compile Include="Helper\StepExtensions.cs" />
+    <Compile Include="Helper\TrivialSolutionFactory.cs" />
     <Compile Include="Importer\ModImporter.cs" />
     <Compile Include="Models\Building.cs" />
     <Compile Include="Models\EnergySource.cs" />
+    <Compile Include="Models\Factory\FlowStep.cs" />
+    <Compile Include="Models\Factory\IStep.cs" />
+    <Compile Include="Models\Factory\ProductionStep.cs" />
+    <Compile Include="Models\Factory\SourceStep.cs" />
+    <Compile Include="Models\Factory\TransformStep.cs" />
+    <Compile Include="Models\Factory\Step.cs" />
     <Compile Include="Models\Item.cs" />
+    <Compile Include="Models\ItemType.cs" />
     <Compile Include="Models\Library.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\ItemAmount.cs" />
@@ -119,6 +131,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

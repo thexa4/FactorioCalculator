@@ -35,5 +35,25 @@ namespace FactorioCalculator.Models
         {
             _library = library;
         }
+
+        /// <summary>
+        /// Calculates the maximum amount of times the recipe can be run in one second.
+        /// </summary>
+        /// <param name="recipe">The recipe to calculate the production speed for</param>
+        /// <returns>The amount of time the recipe can be executed in one second</returns>
+        public double MaxProductionFor(Recipe recipe)
+        {
+            if (ProductionSpeed <= 0)
+                return 0;
+            if (!CraftingCategories.Contains(recipe.CraftingCategory))
+                return 0;
+            var duration = recipe.Time / ProductionSpeed;
+            return 1 / duration;
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

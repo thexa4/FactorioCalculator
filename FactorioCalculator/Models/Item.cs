@@ -16,6 +16,8 @@ namespace FactorioCalculator.Models
         public string PlaceResultName { get; set; }
 
         public bool IsResource { get; set; }
+
+        public ItemType ItemType { get; set; }
         public Building PlaceResult
         {
             get

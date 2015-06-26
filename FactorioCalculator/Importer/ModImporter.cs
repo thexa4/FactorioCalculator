@@ -41,7 +41,7 @@ namespace FactorioCalculator.Importer
                 if (!appdata.Exists)
                     appdata.Create();
 
-                //CopyDirectory(new DirectoryInfo(Path.Combine(corepath, "lualib")), appdata);
+                CopyDirectory(new DirectoryInfo(Path.Combine(corepath, "lualib")), appdata);
                 Directory.SetCurrentDirectory(appdata.FullName);
 
                 //Import global classes
@@ -51,7 +51,7 @@ namespace FactorioCalculator.Importer
                         f.Call(file);
                 }
 
-                //CopyDirectory(new DirectoryInfo(ModulePath), appdata);
+                CopyDirectory(new DirectoryInfo(ModulePath), appdata);
 
                 
                 using (var f = lua.LoadFile("data.lua"))
@@ -109,7 +109,7 @@ namespace FactorioCalculator.Importer
                 foreach (var entity in entitylist.Values.OfType<LuaTable>())
                 {
                     //HACK: try to find a better way to select only entities
-                    if (!entity.ContainsKey("icon"))
+                    if (!entity.ContainsKey("icon") || (string)entity["type"] == "technology")
                         continue;
 
                     var name = entity["name"] as string;
@@ -124,6 +124,9 @@ namespace FactorioCalculator.Importer
 
                     if (entity.ContainsKey("crafting_speed"))
                         result.ProductionSpeed = (double)entity["crafting_speed"];
+
+                    if (entity.ContainsKey("ingredient_count"))
+                        result.IngredientCount = (int)((double)entity["ingredient_count"]);
 
                     if (entity.ContainsKey("energy_source"))
                     {

@@ -1,5 +1,6 @@
 ﻿using FactorioCalculator.Importer;
 using FactorioCalculator.Models;
+using FactorioCalculator.Models.Factory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,12 @@ namespace FactorioCalculator
         [STAThread]
         static void Main()
         {
-            ModImporter a = new ModImporter(@"C:\Users\Max\Documents\Factorio_0.9.8.9400", "base");
+            ModImporter a = new ModImporter(@"C:\Program Files\Factorio", "base");
             a.Load();
 
+            var assembler = a.Library.Buildings.Where((b) => b.Name == "assembling-machine-1").First();
+            var recipe = a.Library.Recipes.Where((r) => r.Name == "copper-cable").First();
+            var step = new ProductionStep(null, new IStep[] { }, recipe, 10, assembler);
 
             Console.WriteLine(a.Library.RecipeChains.Last().Value.First().Waste);
 
