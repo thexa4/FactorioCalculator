@@ -10,7 +10,7 @@ namespace FactorioCalculator.Models.Factory
     /// <summary>
     /// Represents an abstract step in the production process
     /// </summary>
-    class Step
+    class Step : IStep
     {
         /// <summary>
         /// The parent step

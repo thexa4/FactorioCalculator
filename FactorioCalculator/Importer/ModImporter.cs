@@ -57,8 +57,6 @@ namespace FactorioCalculator.Importer
                 using (var f = lua.LoadFile("data.lua"))
                     f.Call("data.lua");
 
-
-                Console.WriteLine(String.Join(", ", lua.Globals));
                 LuaTable data = lua["data"] as LuaTable;
                 var raw = data["raw"] as LuaTable;
                 var resources = raw["resource"] as LuaTable;
@@ -156,9 +154,6 @@ namespace FactorioCalculator.Importer
                             else
                                 result.Energy = (double)entity[key];
                         }
-
-
-                        Debug.WriteLine("{0}: {1} ({2})", name, result.EnergySource, result.Energy);
                     }
 
                     yield return result;

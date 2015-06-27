@@ -25,5 +25,10 @@ namespace FactorioCalculator.Models.Factory
             Recipe = recipe;
             Amount = amount;
         }
+
+        public override string ToString()
+        {
+            return String.Format("Transform<{0} x {1}>", Recipe.Name, Amount);
+        }
     }
 }

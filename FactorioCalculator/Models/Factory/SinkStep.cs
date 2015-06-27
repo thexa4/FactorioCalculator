@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.Factory
 {
-    /// <summary>
-    /// Represents a spawn point of a certain resource
-    /// </summary>
-    class SourceStep : Step
+    class SinkStep : Step
     {
         public ItemAmount Amount { get; private set; }
 
-        public SourceStep(IStep parent, IEnumerable<IStep> previous, ItemAmount amount)
+        public SinkStep(IStep parent, IEnumerable<IStep> previous, ItemAmount amount)
             : base(parent, previous)
         {
             Amount = amount;
@@ -21,7 +18,7 @@ namespace FactorioCalculator.Models.Factory
 
         public override string ToString()
         {
-            return String.Format("Source<{0}>", Amount);
+            return String.Format("Sink<{0}>", Amount);
         }
     }
 }

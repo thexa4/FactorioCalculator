@@ -41,7 +41,7 @@ namespace FactorioCalculator.Models
         }
         
         [NonSerialized]
-        private Library _library;        
+        internal Library _library;        
 
         public Item(string name)
         {

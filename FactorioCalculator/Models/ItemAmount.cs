@@ -27,12 +27,72 @@ namespace FactorioCalculator.Models
             Amount = amount;
         }
 
-        public ItemAmount(Item item, double amount) : this(item.Name, amount) { }
+        public ItemAmount(Item item, double amount) : this(item.Name, amount)
+        {
+            Initialize(item._library);
+        }
 
         public void Initialize(Library library)
         {
             _library = library;
         }
+
+        #region Operators
+        public static ItemAmount operator *(double multiplier, ItemAmount amount)
+        {
+            return new ItemAmount(amount.Item, amount.Amount * multiplier);
+        }
+        public static ItemAmount operator *(ItemAmount amount, double multiplier)
+        {
+            return new ItemAmount(amount.Item, amount.Amount * multiplier);
+        }
+
+        public static ItemAmount operator /(double multiplier, ItemAmount amount)
+        {
+            return new ItemAmount(amount.Item, amount.Amount / multiplier);
+        }
+        public static ItemAmount operator /(ItemAmount amount, double multiplier)
+        {
+            return new ItemAmount(amount.Item, amount.Amount / multiplier);
+        }
+
+        public static ItemAmount operator +(ItemAmount item1, ItemAmount item2)
+        {
+            if (item1.Item != item2.Item)
+                throw new Exception("Items don't match");
+            return new ItemAmount(item1.Item, item1.Amount + item2.Amount);
+        }
+
+        public static ItemAmount operator -(ItemAmount item1, ItemAmount item2)
+        {
+            if (item1.Item != item2.Item)
+                throw new Exception("Items don't match");
+            return new ItemAmount(item1.Item, item1.Amount - item2.Amount);
+        }
+
+        public static ItemAmount operator +(double addition, ItemAmount amount)
+        {
+            return new ItemAmount(amount.Item, amount.Amount + addition);
+        }
+        public static ItemAmount operator +(ItemAmount amount, double addition)
+        {
+            return new ItemAmount(amount.Item, amount.Amount + addition);
+        }
+
+        public static ItemAmount operator -(double addition, ItemAmount amount)
+        {
+            return new ItemAmount(amount.Item, amount.Amount - addition);
+        }
+        public static ItemAmount operator -(ItemAmount amount, double addition)
+        {
+            return new ItemAmount(amount.Item, amount.Amount - addition);
+        }
+
+        public static ItemAmount operator -(ItemAmount amount)
+        {
+            return new ItemAmount(amount.Item, -amount.Amount);
+        }
+        #endregion
 
         public override string ToString()
         {

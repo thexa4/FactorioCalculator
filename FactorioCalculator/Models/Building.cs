@@ -47,6 +47,9 @@ namespace FactorioCalculator.Models
                 return 0;
             if (!CraftingCategories.Contains(recipe.CraftingCategory))
                 return 0;
+            if (recipe.Ingredients.Count() > IngredientCount)
+                return 0;
+
             var duration = recipe.Time / ProductionSpeed;
             return 1 / duration;
         }
