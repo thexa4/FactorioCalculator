@@ -14,7 +14,6 @@ namespace FactorioCalculator.Models.Factory
         public ItemAmount Amount { get; private set; }
 
         public SourceStep(IStep parent, IEnumerable<IStep> previous, ItemAmount amount)
-            : base(parent, previous)
         {
             Amount = amount;
         }

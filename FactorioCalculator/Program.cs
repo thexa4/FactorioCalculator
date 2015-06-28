@@ -25,9 +25,9 @@ namespace FactorioCalculator
             //var recipe = a.Library.Recipes.Where((r) => r.Name == "light-oil").First();
             //var step = new ProductionStep(null, new IStep[] { }, recipe, 1, assembler);
 
-            var item = a.Library.Items.Where((i) => i.Name == "petroleum-gas").First();
-
-            TrivialSolutionFactory.GenerateProductionLayer(a.Library, item, 2).PrintDot();
+            var item = a.Library.Items.Where((i) => i.Name == "speed-module-3").First();
+            RecipeGraph.FromLibrary(a.Library, new Item[] { a.Library.Items.Where((i) => i.Name == "copper-plate").First() }, new Item[] { a.Library.Items.Where((i) => i.Name == "copper-cable").First() }, (r) => r.Ingredients.Select((i) => i.Amount).Sum() / r.Results.Select((i) => i.Amount).Sum(), 10000);
+            //TrivialSolutionFactory.GenerateProductionLayer(a.Library, item, 2).PrintDot();
 
             //Console.WriteLine(a.Library.RecipeChains.Last().Value.First().Waste);
 

@@ -15,10 +15,10 @@ namespace FactorioCalculator.Models.Factory
         /// <summary>
         /// The parent step
         /// </summary>
-        IStep Parent { get; }
+        IStep Parent { get; set; }
         /// <summary>
         /// The step(s) that precede this one
         /// </summary>
-        ImmutableHashSet<IStep> Previous { get; }
+        HashSet<IStep> Previous { get; }
     }
 }

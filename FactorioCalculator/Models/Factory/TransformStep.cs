@@ -20,7 +20,7 @@ namespace FactorioCalculator.Models.Factory
         /// </summary>
         public double Amount { get; private set; }
 
-        public TransformStep(IStep parent, IEnumerable<IStep> previous, Recipe recipe, double amount) : base(parent, previous)
+        public TransformStep(IStep parent, IEnumerable<IStep> previous, Recipe recipe, double amount)
         {
             Recipe = recipe;
             Amount = amount;

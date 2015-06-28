@@ -12,7 +12,7 @@ namespace FactorioCalculator.Models.Factory
     class FlowStep : Step
     {
         public ItemAmount Item { get; protected set; }
-        public FlowStep(IStep parent, IEnumerable<IStep> previous, ItemAmount item) : base(parent, previous)
+        public FlowStep(IStep parent, IEnumerable<IStep> previous, ItemAmount item)
         {
             Item = item;
         }

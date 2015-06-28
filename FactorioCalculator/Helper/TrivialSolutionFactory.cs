@@ -13,25 +13,31 @@ namespace FactorioCalculator.Helper
     {
         public static List<IStep> Generate(Library library, Item item, double amount)
         {
-            GenerateProductionLayer(library, item, amount);
+            
 
             return null;
         }
-
+        /*
         public static IEnumerable<IStep> GenerateProductionLayer(Library library, Item item, double amount)
         {
             List<IStep> result = new List<IStep>();
             var chain = FindBestChain(library, item);
             var top = new Step(null, new IStep[] { });
 
-            Queue<Tuple<Item, RecipeChain>> todo = new Queue<Tuple<Item, RecipeChain>>();
+            Queue<Tuple<Item, RecipeGraph>> todo = new Queue<Tuple<Item, RecipeGraph>>();
             Dictionary<Item, ItemAmount> balance = new Dictionary<Item, ItemAmount>();
-            Stack<Tuple<RecipeChain, double>> nodes = new Stack<Tuple<RecipeChain, double>>();
-            todo.Enqueue(new Tuple<Item, RecipeChain>(item, chain));
+            Stack<Tuple<RecipeGraph, double>> nodes = new Stack<Tuple<RecipeGraph, double>>();
+            todo.Enqueue(new Tuple<Item, RecipeGraph>(item, chain));
             foreach (var i in chain.RawIngredients)
-                balance.Add(i, new ItemAmount(i, 0));
+                if(!balance.ContainsKey(i))
+                    balance.Add(i, new ItemAmount(i, 0));
+            foreach (var i in chain.Waste)
+                if (!balance.ContainsKey(i))
+                    balance.Add(i, new ItemAmount(i, 0));
+
             foreach (var i in chain.Current.Results)
-                balance.Add(i.Item, new ItemAmount(i.Item, 0));
+                if (!balance.ContainsKey(i.Item))
+                    balance.Add(i.Item, new ItemAmount(i.Item, 0));
 
             balance[item] -= amount;
 
@@ -43,12 +49,16 @@ namespace FactorioCalculator.Helper
                 var currentChain = queueItem.Item2;
                 var target = balance[currentItem];
 
-                if (target.Amount == 0)
+                if (target.Amount > 0)
                     continue;
 
                 foreach (var input in currentChain.Current.Ingredients)
                     if (currentChain.Ingredients.Count > 0)
-                        todo.Enqueue(new Tuple<Item, RecipeChain>(input.Item, currentChain.Ingredients.Where((c) => c.Current.Results.Where((res) => res.Item == input.Item).Any()).First()));
+                    {
+                        var from = currentChain.Ingredients.Where((c) => c.Current.Results.Where((res) => res.Item == input.Item).Any()).Take(1).ToList();
+                        if(from.Count > 0)
+                            todo.Enqueue(new Tuple<Item, RecipeGraph>(input.Item, from[0]));
+                    }
 
                 var iterations = -target.Amount / currentChain.Current.Results.Where((r) => r.Item == currentItem).First().Amount;
                 foreach (var output in currentChain.Current.Results)
@@ -56,7 +66,7 @@ namespace FactorioCalculator.Helper
                 foreach (var input in currentChain.Current.Ingredients)
                     balance[input.Item] -= input * iterations;
 
-                nodes.Push(new Tuple<RecipeChain, double>(currentChain, iterations));
+                nodes.Push(new Tuple<RecipeGraph, double>(currentChain, iterations));
             }
 
             List<ItemAmount> waste = new List<ItemAmount>();
@@ -104,10 +114,10 @@ namespace FactorioCalculator.Helper
 
             return result;
         }
-
-        public static RecipeChain FindBestChain(Library library, Item item)
+        
+        public static RecipeGraph FindBestChain(Library library, Item item)
         {
             return library.RecipeChains[item].OrderBy((c) => c.Waste.Count()).First();
-        }
+        */
     }
 }

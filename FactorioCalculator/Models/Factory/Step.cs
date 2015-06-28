@@ -12,19 +12,14 @@ namespace FactorioCalculator.Models.Factory
     /// </summary>
     class Step : IStep
     {
+        public IStep Parent { get; set; }
         /// <summary>
         /// The parent step
         /// </summary>
-        public IStep Parent { get; private set; }
+        public HashSet<IStep> Children { get; set; }
         /// <summary>
         /// The step(s) that precede this one
         /// </summary>
-        public ImmutableHashSet<IStep> Previous { get; private set; }
-
-        public Step(IStep parent, IEnumerable<IStep> previous)
-        {
-            Parent = parent;
-            Previous = previous.ToImmutableHashSet();
-        }
+        public HashSet<IStep> Previous { get; set; }
     }
 }

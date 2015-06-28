@@ -79,6 +79,11 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Solver.Foundation, Version=3.0.2.10889, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\contrib\Microsoft.Solver.Foundation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable">
       <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
@@ -107,9 +112,13 @@
     <Compile Include="Helper\TrivialSolutionFactory.cs" />
     <Compile Include="Importer\ModImporter.cs" />
     <Compile Include="Models\Building.cs" />
+    <Compile Include="Models\BuildingRotation.cs" />
     <Compile Include="Models\EnergySource.cs" />
+    <Compile Include="Models\Factory\FlowBuilding.cs" />
     <Compile Include="Models\Factory\FlowStep.cs" />
+    <Compile Include="Models\Factory\IPhysicalBuilding.cs" />
     <Compile Include="Models\Factory\IStep.cs" />
+    <Compile Include="Models\Factory\ProductionBuilding.cs" />
     <Compile Include="Models\Factory\ProductionStep.cs" />
     <Compile Include="Models\Factory\SinkStep.cs" />
     <Compile Include="Models\Factory\SourceStep.cs" />
@@ -120,7 +129,8 @@
     <Compile Include="Models\Library.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\ItemAmount.cs" />
-    <Compile Include="Models\RecipeChain.cs" />
+    <Compile Include="Models\Factory\RecipeGraph.cs" />
+    <Compile Include="Models\SubModule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

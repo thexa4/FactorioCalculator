@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FactorioCalculator.Models.Factory;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,8 +20,8 @@ namespace FactorioCalculator.Models
         private List<Building> _buildings = new List<Building>();
         private List<Recipe> _recipes = new List<Recipe>();
 
-        public Dictionary<Item, List<RecipeChain>> RecipeChains { get; private set; }
-
+        public Dictionary<Item, RecipeGraph> BestRecipe { get; private set; }
+        
         public void Initialize()
         {
             foreach (var i in _items)
@@ -30,7 +31,7 @@ namespace FactorioCalculator.Models
             foreach (var r in _recipes)
                 r.Initialize(this);
 
-            RecipeChains = RecipeChain.InitializeChainDictionary(this);
+            BestRecipe = new Dictionary<Item, RecipeGraph>();
         }
 
         public void AddItem(Item item)
