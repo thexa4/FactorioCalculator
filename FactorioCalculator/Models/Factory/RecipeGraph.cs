@@ -1,5 +1,4 @@
 ﻿using FactorioCalculator.Models.Factory;
-using FactorioCalculator.Models.Solver;
 using FactorioCalculator.Helper;
 using Microsoft.SolverFoundation.Common;
 using Microsoft.SolverFoundation.Solvers;

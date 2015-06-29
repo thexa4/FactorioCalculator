@@ -2,7 +2,6 @@
 using FactorioCalculator.Importer;
 using FactorioCalculator.Models;
 using FactorioCalculator.Models.Factory;
-using FactorioCalculator.Models.Solver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
