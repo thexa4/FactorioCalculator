@@ -9,12 +9,12 @@ namespace FactorioCalculator.Models
 {
     class FluidBox
     {
-        public ProductionType ProductionType { get; protected set; }
-        public Point Position { get; protected set; }
+        public bool IsOutput { get; protected set; }
+        public Vector2 Position { get; protected set; }
 
-        public FluidBox(ProductionType productionType, Point position)
+        public FluidBox(bool isOutput, Vector2 position)
         {
-            ProductionType = productionType;
+            IsOutput = isOutput;
             Position = position;
         }
     }

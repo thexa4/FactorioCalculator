@@ -9,10 +9,10 @@ namespace FactorioCalculator.Models.Factory
 {
     class FlowBuilding : FlowStep, IPhysicalBuilding
     {
-        public Point Position { get; protected set; }
+        public Vector2 Position { get; protected set; }
         public Building Building { get; protected set; }
 
-        public FlowBuilding(ItemAmount item, Building building, Point position)
+        public FlowBuilding(ItemAmount item, Building building, Vector2 position)
             : base(item)
         {
             Item = item;

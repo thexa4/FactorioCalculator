@@ -18,6 +18,8 @@ namespace FactorioCalculator.Models
         public int IngredientCount { get; set; }
         public EnergySource EnergySource { get; set; }
         public List<FluidBox> Fluidboxes { get; set; }
+        public Vector2 Size { get; set; }
+        public bool HidesFluidBox{ get; set; }
         
         [NonSerialized]
         private Library _library;

@@ -114,14 +114,32 @@ namespace FactorioCalculator.Importer
 
                     var result = new Building(name);
 
+                    if (entity.ContainsKey("selection_box"))
+                    {
+                        var selectionBox = entity["selection_box"] as LuaTable;
+                        var v1 = (selectionBox[1.0] as LuaTable).ToVector2();
+                        var v2 = (selectionBox[2.0] as LuaTable).ToVector2();
+                        result.Size = v2 - v1;
+                    }
+
                     if (entity.ContainsKey("fluid_boxes"))
                     {
                         var boxes = entity["fluid_boxes"] as LuaTable;
-
-                        foreach (var thingie in boxes)
+                        
+                        foreach (KeyValuePair<Object, Object> pair in boxes)
                         {
-                            
-                            Console.WriteLine(thingie);
+                            if (pair.Key.Equals("off_when_no_fluid_recipe"))
+                            {
+                                result.HidesFluidBox = (bool)pair.Value;
+                            }
+                            else
+                            {
+                                var values = pair.Value as LuaTable;
+                                result.Fluidboxes.Add(new FluidBox(
+                                    (values["production_type"] as string).Equals("output", StringComparison.OrdinalIgnoreCase),
+                                    (((values["pipe_connections"] as LuaTable)[1.0] as LuaTable)["position"] as LuaTable).ToVector2()
+                                    ));
+                            }
                         }
                     }
 

@@ -128,11 +128,11 @@
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\ItemType.cs" />
     <Compile Include="Models\Library.cs" />
-    <Compile Include="Models\ProductionType.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\ItemAmount.cs" />
     <Compile Include="Models\Factory\RecipeGraph.cs" />
     <Compile Include="Models\SubModule.cs" />
+    <Compile Include="Models\Vector2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -12,7 +12,6 @@ namespace FactorioCalculator.Helper
     class TrivialSolutionFactory
     {
         private Library library;
-        private List<IStep> tempInput;
 
         public TrivialSolutionFactory(Library library, IEnumerable<IStep> inputEnumerable)
         {
@@ -20,31 +19,33 @@ namespace FactorioCalculator.Helper
 
             foreach (IStep step in inputEnumerable)
             {
-                if (step is TransformStep) {
-                    TransformStep transform = (TransformStep)step;
+                var transform = step as TransformStep;
+                var flow = step as FlowStep;
 
+                if (transform != null) {
                     var amount = transform.Amount;
                     var recipe = transform.Recipe;
-                    var mod = 0;
-                    var building = recipe.Buildings;
-                    
-                    var modTime = recipe.Time * 0.5;
-                    
+                    var building = FirstMatchingBuilding(recipe.Buildings);
+                    var modTime = building.MaxProductionFor(recipe);
+                    var nrOfFactories = Math.Ceiling(amount / modTime);
+
+                    for (int i = 0; i < nrOfFactories; i++)
+                    {
+                        //place factory
+                    }
                 }
             }
         }
 
-        //Results lowest factory to build
-        private String checkBuilding(List<Building> buildings) {
-            buildings.RemoveAll((building) => !building.Recipes.Any());
+        /// <summary>
+        /// Results lowest factory to build
+        /// </summary>
+        /// <param name="buildings"></param>
+        /// <returns></returns>
+        private static Building FirstMatchingBuilding(IEnumerable<Building> buildings) {
+            var filtered = buildings.Where((building) => building.Recipes.Any());
             
-            buildings.OrderBy(building => building.IngredientCount);
-            
-            foreach (Building building in buildings) {
-
-            }
-
-            return null;
+            return filtered.OrderBy(building => building.IngredientCount).First();
         }
     }
 }
