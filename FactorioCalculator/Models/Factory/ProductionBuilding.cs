@@ -11,8 +11,8 @@ namespace FactorioCalculator.Models.Factory
     {
         public Point Position { get; protected set; }
 
-        public ProductionBuilding(IStep parent, IEnumerable<IStep> previous, Recipe recipe, double amount, Building building, Point position)
-            : base(parent, previous, recipe, amount, building)
+        public ProductionBuilding(Recipe recipe, double amount, Building building, Point position)
+            : base(recipe, amount, building)
         {
             Position = position;
         }

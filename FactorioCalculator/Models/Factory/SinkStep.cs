@@ -6,18 +6,16 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.Factory
 {
-    class SinkStep : Step
+    class SinkStep : FlowStep
     {
-        public ItemAmount Amount { get; private set; }
-
-        public SinkStep(IStep parent, IEnumerable<IStep> previous, ItemAmount amount)
+        public SinkStep(ItemAmount amount)
+            : base(amount)
         {
-            Amount = amount;
         }
 
         public override string ToString()
         {
-            return String.Format("Sink<{0}>", Amount);
+            return String.Format("Sink<{0}>", Item);
         }
     }
 }

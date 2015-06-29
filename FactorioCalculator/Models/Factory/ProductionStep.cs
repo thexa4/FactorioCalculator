@@ -12,8 +12,8 @@ namespace FactorioCalculator.Models.Factory
 
         public double MaxAmount { get { return Building.MaxProductionFor(Recipe); } }
 
-        public ProductionStep(IStep parent, IEnumerable<IStep> previous, Recipe recipe, double amount, Building building)
-            : base(parent, previous, recipe, amount)
+        public ProductionStep(Recipe recipe, double amount, Building building)
+            : base(recipe, amount)
         {
             Building = building;
 

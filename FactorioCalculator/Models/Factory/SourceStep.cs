@@ -9,18 +9,17 @@ namespace FactorioCalculator.Models.Factory
     /// <summary>
     /// Represents a spawn point of a certain resource
     /// </summary>
-    class SourceStep : Step
+    class SourceStep : FlowStep
     {
-        public ItemAmount Amount { get; private set; }
-
-        public SourceStep(IStep parent, IEnumerable<IStep> previous, ItemAmount amount)
+        public SourceStep(ItemAmount amount)
+            : base(amount)
         {
-            Amount = amount;
+
         }
 
         public override string ToString()
         {
-            return String.Format("Source<{0}>", Amount);
+            return String.Format("Source<{0}>", Item);
         }
     }
 }

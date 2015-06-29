@@ -11,10 +11,15 @@ namespace FactorioCalculator.Models.Factory
     /// </summary>
     class FlowStep : Step
     {
-        public ItemAmount Item { get; protected set; }
-        public FlowStep(IStep parent, IEnumerable<IStep> previous, ItemAmount item)
+        public ItemAmount Item { get; set; }
+        public FlowStep(ItemAmount item)
         {
             Item = item;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("Flow<{0}>", Item);
         }
     }
 }
