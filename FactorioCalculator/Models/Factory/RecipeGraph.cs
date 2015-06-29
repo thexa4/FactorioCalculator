@@ -31,6 +31,14 @@ namespace FactorioCalculator.Models.Factory
         public IEnumerable<TransformStep> Transformations { get { return _transformations; } }
         private List<TransformStep> _transformations = new List<TransformStep>();
 
+        public IEnumerable<IStep> Children
+        {
+            get
+            {
+                return _waste.Cast<IStep>().Concat(_inputs).Concat(_outputs).Concat(_resources).Concat(_transformations);
+            }
+        }
+
         public RecipeGraph(IEnumerable<SinkStep> waste, IEnumerable<SourceStep> inputs, IEnumerable<SinkStep> outputs, IEnumerable<FlowStep> resources, IEnumerable<TransformStep> transformations)
         {
             _waste.AddRange(waste);

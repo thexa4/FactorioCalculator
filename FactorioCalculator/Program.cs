@@ -18,7 +18,7 @@ namespace FactorioCalculator
         [STAThread]
         static void Main()
         {
-            ModImporter a = new ModImporter(@"D:\Program Files\Factorio", "base");
+            ModImporter a = new ModImporter(@"C:\Program Files\Factorio", "base");
             a.Load();
 
             //var assembler = a.Library.Buildings.Where((b) => b.Name == "assembling-machine-1").First();
@@ -48,8 +48,8 @@ namespace FactorioCalculator
             
             //Console.WriteLine(a.Library.RecipeChains.Last().Value.First().Waste);
 
-            List<IStep> tempInput = new List<IStep>() { new TransformStep(null, new IStep[]{}, a.Library.Recipes.Where((i) => i.Name == "copper-cable").First(), 20.0) };
-            var solution = new TrivialSolutionFactory(a.Library, tempInput);
+            
+            var solution = new TrivialSolutionFactory(a.Library, graph.Children);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
