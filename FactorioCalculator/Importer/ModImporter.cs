@@ -114,6 +114,17 @@ namespace FactorioCalculator.Importer
 
                     var result = new Building(name);
 
+                    if (entity.ContainsKey("fluid_boxes"))
+                    {
+                        var boxes = entity["fluid_boxes"] as LuaTable;
+
+                        foreach (var thingie in boxes)
+                        {
+                            
+                            Console.WriteLine(thingie);
+                        }
+                    }
+
                     if (entity.ContainsKey("crafting_categories"))
                     {
                         var categories = entity["crafting_categories"] as LuaTable;

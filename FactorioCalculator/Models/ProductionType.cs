@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FactorioCalculator.Models
+{
+    enum ProductionType
+    {
+        Input = 0,
+        Output = 1,
+    }
+}

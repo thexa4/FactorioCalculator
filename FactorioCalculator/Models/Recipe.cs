@@ -11,7 +11,7 @@ namespace FactorioCalculator.Models
     class Recipe : SubModule
     {
         public string CraftingCategory { get; set; }
-        public IEnumerable<Building> Buildings { get { return _library.Buildings.Where((b) => b.CraftingCategories.Contains(CraftingCategory)); } }
+        public IEnumerable<Building> Buildings { get { return _library.Buildings.Where((b) => b.CraftingCategories.Contains(CraftingCategory) && b.IngredientCount >= Ingredients.Count()); } }
 
         public Recipe(string name)
             : base(name)

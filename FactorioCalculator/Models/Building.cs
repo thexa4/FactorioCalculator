@@ -17,6 +17,7 @@ namespace FactorioCalculator.Models
         public double Energy { get; set; }
         public int IngredientCount { get; set; }
         public EnergySource EnergySource { get; set; }
+        public List<FluidBox> Fluidboxes { get; set; }
         
         [NonSerialized]
         private Library _library;
@@ -29,6 +30,7 @@ namespace FactorioCalculator.Models
             Energy = 0;
             EnergySource = Models.EnergySource.None;
             IngredientCount = 0;
+            Fluidboxes = new List<FluidBox>();
         }
 
         public void Initialize(Library library)

@@ -124,9 +124,11 @@
     <Compile Include="Models\Factory\SourceStep.cs" />
     <Compile Include="Models\Factory\TransformStep.cs" />
     <Compile Include="Models\Factory\Step.cs" />
+    <Compile Include="Models\FluidBox.cs" />
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\ItemType.cs" />
     <Compile Include="Models\Library.cs" />
+    <Compile Include="Models\ProductionType.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\ItemAmount.cs" />
     <Compile Include="Models\Factory\RecipeGraph.cs" />
