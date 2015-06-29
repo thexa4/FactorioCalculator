@@ -26,26 +26,6 @@ namespace FactorioCalculator
             //var recipe = a.Library.Recipes.Where((r) => r.Name == "light-oil").First();
             //var step = new ProductionStep(null, new IStep[] { }, recipe, 1, assembler);
 
-            var source1 = new Node() { Tag = "source1", Flow = 10 };
-            var source2 = new Node() { Tag = "source2", Flow = 20 };
-            var sink = new Node() { Tag = "sink", Flow = -30 };
-            var mid = new Node() { Tag = "mid" };
-            var arc1 = new Arc(source1, mid) { Cost = 1 };
-            var arc2 = new Arc(source2, mid) { Cost = 1 };
-            var equals = new Dictionary<Arc, double>() { { arc1, 1 }, { arc2, 2 } };
-            arc1.ConstantGroup = equals;
-            arc2.ConstantGroup = equals;
-            var arc3 = new Arc(source2, sink) { Cost = 10 };
-            var arc4 = new Arc(mid, sink) { Cost = 1, Multiplier = 3 };
-            // arc5 = new Arc(source1, sink) { Cost = 1000 };
-            List<Arc> arcs = new List<Arc>() { arc1, arc2, arc3, arc4 };
-            List<Node> nodes = new List<Node>() { mid, sink, source1, source2 };
-
-            //foreach (var node in nodes.SortTopological((z, x) => arcs.Where((i) => i.From == z && i.To == x).Any()))
-            //    Console.WriteLine(node.Tag);
-
-            //var cost = MinCostMaxFlowSolver.Solve(nodes, arcs, true);
-
             var item = a.Library.Items.Where((i) => i.Name == "speed-module-3").First();
             var copperPlate = a.Library.Items.Where((i) => i.Name == "copper-plate").First();
             var ironPlate = a.Library.Items.Where((i) => i.Name == "iron-plate").First();
