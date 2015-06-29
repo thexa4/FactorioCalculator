@@ -41,9 +41,9 @@ namespace FactorioCalculator
             var graph = RecipeGraph.FromLibrary(a.Library,
                 new Item[] { copperPlate, ironPlate, coal, oil, alienArtifact, stone, water },
                 new ItemAmount[] { new ItemAmount(science3, 1) },
-                (r) => 1, 10000);
+                (r) => 1);
 
-            graph.PrintDotFormat();
+            graph.Children.PrintDot();
             //TrivialSolutionFactory.GenerateProductionLayer(a.Library, item, 2).PrintDot();
             
             //Console.WriteLine(a.Library.RecipeChains.Last().Value.First().Waste);

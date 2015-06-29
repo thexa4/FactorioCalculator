@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace FactorioCalculator.Models.Factory
 
         public override string ToString()
         {
-            return String.Format("Sink<{0}>", Item);
+            return String.Format(CultureInfo.InvariantCulture, "Sink<{0}>", Item);
         }
     }
 }

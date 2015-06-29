@@ -227,14 +227,14 @@ namespace FactorioCalculator.Importer
 
         private static double ParseEnergy(string energy)
         {
-            energy = energy.Trim().ToLowerInvariant();
+            energy = energy.Trim();
             
             double multiplier = 1;
-            if (energy.EndsWith("kw"))
+            if (energy.EndsWith("KW", StringComparison.OrdinalIgnoreCase))
                 multiplier = 1000;
-            if(energy.EndsWith("mw"))
+            if (energy.EndsWith("MW", StringComparison.OrdinalIgnoreCase))
                 multiplier = 1000*1000;
-            if (energy.EndsWith("gw"))
+            if (energy.EndsWith("GW", StringComparison.OrdinalIgnoreCase))
                 multiplier = 1000 * 1000 * 1000;
 
             Regex filter = new Regex("^[0-9,.-]+");

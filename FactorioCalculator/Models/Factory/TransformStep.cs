@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace FactorioCalculator.Models.Factory
 
         public override string ToString()
         {
-            return String.Format("Transform<{0} x {1}>", Recipe.Name, Amount);
+            return String.Format(CultureInfo.InvariantCulture, "Transform<{0} x {1}>", Recipe.Name, Amount);
         }
     }
 }

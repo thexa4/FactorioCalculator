@@ -11,6 +11,8 @@ namespace FactorioCalculator.Helper
     {
         public static bool ContainsKey(this LuaTable table, string key)
         {
+            if (table == null)
+                throw new ArgumentNullException("table");
             return table.Keys.OfType<string>().Contains(key);
         }
     }

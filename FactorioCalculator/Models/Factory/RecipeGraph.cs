@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SolverFoundation.Services;
+using System.Globalization;
 
 namespace FactorioCalculator.Models.Factory
 {
@@ -49,18 +50,8 @@ namespace FactorioCalculator.Models.Factory
             foreach (var step in _waste.Cast<IStep>().Concat(_inputs).Concat(_outputs).Concat(_resources).Concat(_transformations))
                 step.Parent = this;
         }
-
-        public void PrintDotFormat()
-        {
-            Console.WriteLine("digraph flow {");
-            foreach (var step in _waste.Cast<IStep>().Concat(_inputs).Concat(_outputs).Concat(_resources).Concat(_transformations))
-                foreach (var prev in step.Previous)
-                    Console.WriteLine(String.Format("\"{0}\"\t->\t\"{1}\"\t;", prev, step));
-            Console.WriteLine("}");
-        }
-
         
-        public static RecipeGraph FromLibrary(Library library, IEnumerable<Item> inputs, IEnumerable<ItemAmount> outputs, Func<Item, double> costFunction, double wasteCost)
+        public static RecipeGraph FromLibrary(Library library, IEnumerable<Item> inputs, IEnumerable<ItemAmount> outputs, Func<Item, double> costFunction)
         {
             var solver = new SimplexSolver();
             var itemRows = new Dictionary<Item, int>();
@@ -103,7 +94,7 @@ namespace FactorioCalculator.Models.Factory
             {
                 var row = itemRows[item];
                 solver.SetBounds(row, Rational.NegativeInfinity, 0);
-                solver.AddGoal(row, 10000, false);
+                solver.AddGoal(row, (int)(10000 * costFunction(item)), false);
             }
 
             solver.Solve(new SimplexSolverParams());
@@ -139,14 +130,12 @@ namespace FactorioCalculator.Models.Factory
                     else
                         wasteSteps.Add(sink);
                     itemSteps.Add(item, sink);
-                    Console.WriteLine("sink: " + item);
                 }
                 else if(value < 0)
                 {
                     var source = new SourceStep(new ItemAmount(item, -value));
                     inputSteps.Add(source);
                     itemSteps.Add(item, source);
-                    Console.WriteLine("source: " + item);
                 }
             }
 
