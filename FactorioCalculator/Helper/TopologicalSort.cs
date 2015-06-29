@@ -18,13 +18,18 @@ namespace FactorioCalculator.Helper
         public static IEnumerable<T> SortTopological<T>(this IEnumerable<T> inputs, Func<T, T, bool> linksTo)
         {
             Dictionary<T, int> links = new Dictionary<T,int>();
+            Dictionary<Tuple<T, T>, bool> linkCache = new Dictionary<Tuple<T, T>, bool>();
 
             foreach (var input in inputs)
             {
                 links.Add(input, 0);
                 foreach (var target in inputs)
-                    if (linksTo(input, target))
+                {
+                    var link = linksTo(target, input);
+                    linkCache.Add(new Tuple<T, T>(target, input), link);
+                    if (link)
                         links[input]++;
+                }
             }
 
             while (links.Count != 0)
@@ -43,7 +48,7 @@ namespace FactorioCalculator.Helper
                 {
                     links.Remove(key);
                     foreach (var target in inputs)
-                        if (linksTo(key, target))
+                        if (linkCache[new Tuple<T,T>(key, target)])
                             links[target]--;
                 }
 

@@ -12,8 +12,8 @@ namespace FactorioCalculator.Models.Factory
         public Point Position { get; protected set; }
         public Building Building { get; protected set; }
 
-        public FlowBuilding(IStep parent, IEnumerable<IStep> previous, ItemAmount item, Building building, Point position)
-            : base(parent, previous, item)
+        public FlowBuilding(ItemAmount item, Building building, Point position)
+            : base(item)
         {
             Item = item;
             Building = building;

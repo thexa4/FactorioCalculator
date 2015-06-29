@@ -1,4 +1,5 @@
 ﻿using FactorioCalculator.Models.Factory;
+using FactorioCalculator.Helper;
 using Microsoft.SolverFoundation.Common;
 using Microsoft.SolverFoundation.Solvers;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.SolverFoundation.Services;
 
 namespace FactorioCalculator.Models.Factory
 {
@@ -18,11 +20,11 @@ namespace FactorioCalculator.Models.Factory
         /// </summary>
         public HashSet<IStep> Previous { get; set; }
 
-        public IEnumerable<Item> Waste { get { return _waste.Select((s) => s.Amount.Item);  } }
+        public IEnumerable<Item> Waste { get { return _waste.Select((s) => s.Item.Item);  } }
         private List<SinkStep> _waste = new List<SinkStep>();
-        public IEnumerable<Item> Inputs { get { return _inputs.Select((s) => s.Amount.Item); } }
+        public IEnumerable<Item> Inputs { get { return _inputs.Select((s) => s.Item.Item); } }
         private List<SourceStep> _inputs = new List<SourceStep>();
-        public IEnumerable<Item> Outputs { get { return _outputs.Select((s) => s.Amount.Item); } }
+        public IEnumerable<Item> Outputs { get { return _outputs.Select((s) => s.Item.Item); } }
         private List<SinkStep> _outputs = new List<SinkStep>();
         public IEnumerable<FlowStep> Resources { get { return _resources; } }
         private List<FlowStep> _resources = new List<FlowStep>();
@@ -35,94 +37,133 @@ namespace FactorioCalculator.Models.Factory
             _inputs.AddRange(inputs);
             _outputs.AddRange(outputs);
             _resources.AddRange(resources);
-            _transformations.AddRange(transformations);            
+            _transformations.AddRange(transformations);
+            foreach (var step in _waste.Cast<IStep>().Concat(_inputs).Concat(_outputs).Concat(_resources).Concat(_transformations))
+                step.Parent = this;
         }
 
-        private class Node
+        public void PrintDotFormat()
         {
-            public double Flow { get; set; }
+            Console.WriteLine("digraph flow {");
+            foreach (var step in _waste.Cast<IStep>().Concat(_inputs).Concat(_outputs).Concat(_resources).Concat(_transformations))
+                foreach (var prev in step.Previous)
+                    Console.WriteLine(String.Format("\"{0}\"\t->\t\"{1}\"\t;", prev, step));
+            Console.WriteLine("}");
         }
-        private class Arc
-        {
-            public Node From { get; set; }
-            public Node To { get; set; }
-            public double Cost { get; set; }
-            public int Variable { get; set; }
-            public Arc(Node from, Node to)
-            {
-                From = from;
-                To = to;
-            }
-        }
-        public static RecipeGraph FromLibrary(Library library, IEnumerable<Item> inputs, IEnumerable<Item> outputs, Func<Recipe, double> costFunction, double wasteCost)
+
+        
+        public static RecipeGraph FromLibrary(Library library, IEnumerable<Item> inputs, IEnumerable<ItemAmount> outputs, Func<Item, double> costFunction, double wasteCost)
         {
             var solver = new SimplexSolver();
-            var nodes = new List<Node>();
-            var arcs = new List<Arc>();
-            var itemNodes = new Dictionary<Item, Node>();
-            var productionIn = new Dictionary<Item, Node>();
-            var productionOut = new Dictionary<Item, Node>();
-            var waste = new Node();
-
-            //Todo: add input discard cost and flow
+            var itemRows = new Dictionary<Item, int>();
+            var recipeVars = new Dictionary<Recipe, int>();
+            var wasteGoals = new Dictionary<Item, ILinearGoal>();
 
             foreach (var item in library.Items)
             {
-                var node = new Node();
-                nodes.Add(node);
-                var wasteArc = new Arc(node, waste) { Cost = wasteCost };
-                arcs.Add(wasteArc);
-                itemNodes.Add(item, node);
+                int id;
+                solver.AddRow(item, out id);
+                itemRows.Add(item, id);
+                solver.SetBounds(id, 0, Rational.PositiveInfinity);
+                if(!inputs.Contains(item))
+                    wasteGoals.Add(item, solver.AddGoal(id, 1, true));
             }
-            
-            foreach(var recipe in library.Recipes)
+
+            // Bound output to requested values
+            foreach (var itemAmount in outputs)
             {
-                var inNode = new Node();
-                nodes.Add(inNode);
-                var outNode = new Node();
-                nodes.Add(outNode);
-                var cost = costFunction(recipe);
-                var productionArc = new Arc(inNode, outNode) { Cost = cost };
-                arcs.Add(productionArc);
-
-                foreach (var input in recipe.Ingredients)
-                {
-                    var arc = new Arc(itemNodes[input.Item], inNode);
-                    arcs.Add(arc);
-                }
-                foreach (var output in recipe.Results)
-                {
-                    var arc = new Arc(itemNodes[output.Item], outNode);
-                    arcs.Add(arc);
-                }
+                var item = itemAmount.Item;
+                var amount = itemAmount.Amount;
+                solver.SetBounds(itemRows[item], amount, amount);
             }
 
-            var outFlow = inputs.Count(); // (inputsize * outputsize) / outputsize
-            var inFlow = outputs.Count();
-
-            foreach (var input in inputs)
-                itemNodes[input].Flow = inFlow;
-            foreach (var output in outputs)
-            {
-                var node = itemNodes[output];
-                node.Flow = -outFlow;
-                var wasteArc = new Arc(waste, node);
-                arcs.Add(wasteArc);
-            }
-
-            foreach (var arc in arcs)
+            foreach (var recipe in library.Recipes)
             {
                 int id;
-                solver.AddVariable(arc, out id);
-                arc.Variable = id;
+                solver.AddVariable(recipe, out id);
+                recipeVars.Add(recipe, id);
                 solver.SetBounds(id, 0, Rational.PositiveInfinity);
+
+                foreach (var input in recipe.Ingredients)
+                    solver.SetCoefficient(itemRows[input.Item], id, -input.Amount);
+                foreach (var output in recipe.Results)
+                    solver.SetCoefficient(itemRows[output.Item], id, output.Amount);
             }
-            int costRow;
-            solver.AddRow(new Object(), out costRow);
-            foreach (var arc in arcs)
-                solver.SetCoefficient(costRow, arc.Variable, arc.Cost);
-            
-            return null;
+
+            // Add input minimize goals
+            foreach (var item in inputs)
+            {
+                var row = itemRows[item];
+                solver.SetBounds(row, Rational.NegativeInfinity, 0);
+                solver.AddGoal(row, 10000, false);
+            }
+
+            solver.Solve(new SimplexSolverParams());
+
+            if (solver.SolutionQuality != Microsoft.SolverFoundation.Services.LinearSolutionQuality.Exact)
+                throw new InvalidOperationException("Cannot solve problem");
+
+            List<Tuple<Recipe, double>> usedRecipes = new List<Tuple<Recipe, double>>();
+
+            foreach (var recipe in library.Recipes)
+            {
+                var value = (double)solver.GetValue(recipeVars[recipe]);
+                if (value > 0)
+                    usedRecipes.Add(new Tuple<Recipe, double>(recipe, value));
+            }
+
+            var sortedRecipes = usedRecipes.SortTopological((a, b) => a.Item1.Results.Select((i) => i.Item).Intersect(b.Item1.Ingredients.Select((i) => i.Item)).Any());
+            List<SourceStep> inputSteps = new List<SourceStep>();
+            List<SinkStep> outputSteps = new List<SinkStep>();
+            List<SinkStep> wasteSteps = new List<SinkStep>();
+            Dictionary<Item, FlowStep> itemSteps = new Dictionary<Item, FlowStep>();
+            List<FlowStep> flowSteps = new List<FlowStep>();
+            List<TransformStep> transformSteps = new List<TransformStep>();
+
+            foreach (var item in library.Items)
+            {
+                var value = (double)solver.GetValue(itemRows[item]);
+                if (value > 0)
+                {
+                    var sink = new SinkStep(new ItemAmount(item, value));
+                    if (outputs.Select((o) => o.Item).Contains(item))
+                        outputSteps.Add(sink);
+                    else
+                        wasteSteps.Add(sink);
+                    itemSteps.Add(item, sink);
+                    Console.WriteLine("sink: " + item);
+                }
+                else if(value < 0)
+                {
+                    var source = new SourceStep(new ItemAmount(item, -value));
+                    inputSteps.Add(source);
+                    itemSteps.Add(item, source);
+                    Console.WriteLine("source: " + item);
+                }
+            }
+
+            foreach (var recipe in sortedRecipes)
+            {
+                var previous = recipe.Item1.Ingredients.Select((i) => i.Item).Select((i) => itemSteps[i]);
+                var step = new TransformStep(recipe.Item1, recipe.Item2);
+                foreach (var prev in previous)
+                    step.Previous.Add(prev);
+
+                foreach (var amount in recipe.Item1.Results)
+                {
+                    var item = amount.Item;
+                    if(!itemSteps.ContainsKey(item)){
+                        var flowstep = new FlowStep(new ItemAmount(item, 0));
+                        itemSteps.Add(item, flowstep);
+                        flowSteps.Add(flowstep);
+                    }
+                    itemSteps[item].Previous.Add(step);
+                    itemSteps[item].Item += amount * recipe.Item2;
+                }
+                transformSteps.Add(step);
+            }
+
+            return new RecipeGraph(wasteSteps, inputSteps, outputSteps, flowSteps, transformSteps);
         }
     }
 }

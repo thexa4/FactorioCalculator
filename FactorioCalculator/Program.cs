@@ -26,9 +26,26 @@ namespace FactorioCalculator
             //var step = new ProductionStep(null, new IStep[] { }, recipe, 1, assembler);
 
             var item = a.Library.Items.Where((i) => i.Name == "speed-module-3").First();
-            RecipeGraph.FromLibrary(a.Library, new Item[] { a.Library.Items.Where((i) => i.Name == "copper-plate").First() }, new Item[] { a.Library.Items.Where((i) => i.Name == "copper-cable").First() }, (r) => r.Ingredients.Select((i) => i.Amount).Sum() / r.Results.Select((i) => i.Amount).Sum(), 10000);
-            //TrivialSolutionFactory.GenerateProductionLayer(a.Library, item, 2).PrintDot();
+            var copperPlate = a.Library.Items.Where((i) => i.Name == "copper-plate").First();
+            var ironPlate = a.Library.Items.Where((i) => i.Name == "iron-plate").First();
+            var coal = a.Library.Items.Where((i) => i.Name == "coal").First();
+            var oil = a.Library.Items.Where((i) => i.Name == "crude-oil").First();
+            var water = a.Library.Items.Where((i) => i.Name == "water").First();
+            var electronicCircuit = a.Library.Items.Where((i) => i.Name == "electronic-circuit").First();
+            var science2 = a.Library.Items.Where((i) => i.Name == "science-pack-2").First();
+            var science3 = a.Library.Items.Where((i) => i.Name == "science-pack-3").First();
+            var advancedCircuit = a.Library.Items.Where((i) => i.Name == "advanced-circuit").First();
+            var alienArtifact = a.Library.Items.Where((i) => i.Name == "alien-artifact").First();
+            var stone = a.Library.Items.Where((i) => i.Name == "stone").First();
+            
+            var graph = RecipeGraph.FromLibrary(a.Library,
+                new Item[] { copperPlate, ironPlate, coal, oil, alienArtifact, stone, water },
+                new ItemAmount[] { new ItemAmount(science3, 1) },
+                (r) => 1, 10000);
 
+            graph.PrintDotFormat();
+            //TrivialSolutionFactory.GenerateProductionLayer(a.Library, item, 2).PrintDot();
+            
             //Console.WriteLine(a.Library.RecipeChains.Last().Value.First().Waste);
 
             List<IStep> tempInput = new List<IStep>() { new TransformStep(null, new IStep[]{}, a.Library.Recipes.Where((i) => i.Name == "copper-cable").First(), 20.0) };
