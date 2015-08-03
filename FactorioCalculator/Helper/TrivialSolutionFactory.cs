@@ -11,30 +11,67 @@ namespace FactorioCalculator.Helper
 {
     class TrivialSolutionFactory
     {
-        private Library library;
-
-        public TrivialSolutionFactory(Library library, IEnumerable<IStep> inputEnumerable)
+        public static RecipeGraph CreateFactory(RecipeGraph recipe)
         {
-            this.library = library;
+            var inputs = new List<SourceStep>();
+            var outputs = new List<SinkStep>();
+            var wastes = new List<SinkStep>();
+            var resources = new List<FlowStep>();
+            var transforms = new List<TransformStep>();
 
-            foreach (IStep step in inputEnumerable)
+            foreach (var resource in recipe.Resources)
+                resources.Add(new FlowStep(resource.Item) { Parent = resource });
+
+            foreach(var input in recipe.InputNodes) {
+                var r = new FlowStep(input.Item) { Parent = input };
+                var s = new SourceStep(input.Item) { Parent = input };
+
+                r.Previous.Add(s);
+
+                resources.Add(r);
+                inputs.Add(s);
+            }
+
+            foreach (var output in recipe.OutputNodes)
             {
-                var transform = step as TransformStep;
-                var flow = step as FlowStep;
+                var r = new FlowStep(output.Item) { Parent = output };
+                var o = new SinkStep(output.Item) { Parent = output };
 
-                if (transform != null) {
-                    var amount = transform.Amount;
-                    var recipe = transform.Recipe;
-                    var building = FirstMatchingBuilding(recipe.Buildings);
-                    var modTime = building.MaxProductionFor(recipe);
-                    var nrOfFactories = Math.Ceiling(amount / modTime);
+                o.Previous.Add(r);
 
-                    for (int i = 0; i < nrOfFactories; i++)
-                    {
-                        //place factory
-                    }
+                resources.Add(r);
+                outputs.Add(o);
+            }
+
+            foreach (var waste in recipe.WasteNodes)
+            {
+                var w = new SinkStep(waste.Item) { Parent = waste };
+                wastes.Add(w);
+                w.Previous.Add(resources.Where((r) => r.Item.Item == waste.Item.Item).First());
+            }
+
+            foreach (var transform in recipe.Transformations)
+            {
+                var amount = transform.Amount;
+                var transformRecipe = transform.Recipe;
+                var building = FirstMatchingBuilding(transformRecipe.Buildings);
+                var modTime = building.MaxProductionFor(transformRecipe);
+                var nrOfFactories = Math.Ceiling(amount / modTime);
+
+                for (int i = 0; i < nrOfFactories; i++)
+                {
+                    var p = new ProductionStep(transform.Recipe, transform.Amount / nrOfFactories, building) { Parent = transform };
+                    foreach (var input in transformRecipe.Ingredients)
+                        p.Previous.Add(resources.Where((r) => r.Item.Item == input.Item).First());
+
+                    foreach (var output in transformRecipe.Results)
+                        resources.Where((r) => r.Item.Item == output.Item).First().Previous.Add(p);
+
+                    transforms.Add(p);
                 }
             }
+
+            return new RecipeGraph(wastes, inputs, outputs, resources, transforms);
         }
 
         /// <summary>

@@ -22,10 +22,13 @@ namespace FactorioCalculator.Models.Factory
         public HashSet<IStep> Previous { get; set; }
 
         public IEnumerable<Item> Waste { get { return _waste.Select((s) => s.Item.Item);  } }
+        public IEnumerable<SinkStep> WasteNodes { get { return _waste; } }
         private List<SinkStep> _waste = new List<SinkStep>();
         public IEnumerable<Item> Inputs { get { return _inputs.Select((s) => s.Item.Item); } }
+        public IEnumerable<SourceStep> InputNodes { get { return _inputs; } }
         private List<SourceStep> _inputs = new List<SourceStep>();
         public IEnumerable<Item> Outputs { get { return _outputs.Select((s) => s.Item.Item); } }
+        public IEnumerable<SinkStep> OutputNodes { get { return _outputs; } }
         private List<SinkStep> _outputs = new List<SinkStep>();
         public IEnumerable<FlowStep> Resources { get { return _resources; } }
         private List<FlowStep> _resources = new List<FlowStep>();
@@ -124,7 +127,7 @@ namespace FactorioCalculator.Models.Factory
                 var value = (double)solver.GetValue(itemRows[item]);
                 if (value > 0)
                 {
-                    var sink = new SinkStep(new ItemAmount(item, value));
+                    var sink = new SinkStep(new ItemAmount(item, value / 2));
                     if (outputs.Select((o) => o.Item).Contains(item))
                         outputSteps.Add(sink);
                     else

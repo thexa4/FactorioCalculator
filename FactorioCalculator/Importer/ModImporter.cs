@@ -70,7 +70,7 @@ namespace FactorioCalculator.Importer
                 foreach (var building in ParseEntities(raw))
                     library.AddBuilding(building);
 
-                foreach (var subtree in new string[] { "item", "fluid", "ammo", "module", "mining-tool", "armor", "capsule", "gun", "blueprint", "deconstruction-item", "repair-tool" })
+                foreach (var subtree in new string[] { "item", "fluid", "ammo", "module", "mining-tool", "armor", "capsule", "gun", "blueprint", "deconstruction-item", "repair-tool", "tool" })
                     foreach (var item in ParseItems(raw[subtree] as LuaTable))
                         library.AddItem(item);
 
@@ -147,6 +147,8 @@ namespace FactorioCalculator.Importer
                     {
                         var categories = entity["crafting_categories"] as LuaTable;
                         result.CraftingCategories.AddRange(categories.Values.OfType<string>());
+                        if (result.CraftingCategories.Contains("smelting"))
+                            result.IngredientCount = 1;
                     }
 
                     if (entity.ContainsKey("crafting_speed"))
