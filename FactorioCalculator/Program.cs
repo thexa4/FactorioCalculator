@@ -64,7 +64,6 @@ namespace FactorioCalculator
                 {"medium-electric-pole", 1.0 / 60 / 15}, 
                 {"steel-chest", 1.0 / 60 / 15}, 
                 {"basic-mining-drill", 1.0 / 60 / 15},
-                {"basic-splitter",  1.0 / 60 / 15}
                 //{"advanced-circuit", 1.16388888888889},
             };
 
