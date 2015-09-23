@@ -70,7 +70,7 @@ namespace FactorioCalculator.Importer
                 foreach (var building in ParseEntities(raw))
                     library.AddBuilding(building);
 
-                foreach (var subtree in new string[] { "item", "fluid", "ammo", "module", "mining-tool", "armor", "capsule", "gun", "blueprint", "deconstruction-item", "repair-tool" })
+                foreach (var subtree in new string[] { "item", "fluid", "ammo", "module", "mining-tool", "armor", "capsule", "gun", "blueprint", "deconstruction-item", "repair-tool", "tool", "generator", "boiler" })
                     foreach (var item in ParseItems(raw[subtree] as LuaTable))
                         library.AddItem(item);
 
@@ -248,11 +248,14 @@ namespace FactorioCalculator.Importer
             energy = energy.Trim();
             
             double multiplier = 1;
-            if (energy.EndsWith("KW", StringComparison.OrdinalIgnoreCase))
+            if (energy.EndsWith("KW", StringComparison.OrdinalIgnoreCase) ||
+                energy.EndsWith("KJ", StringComparison.OrdinalIgnoreCase))
                 multiplier = 1000;
-            if (energy.EndsWith("MW", StringComparison.OrdinalIgnoreCase))
+            if (energy.EndsWith("MW", StringComparison.OrdinalIgnoreCase) ||
+                energy.EndsWith("MJ", StringComparison.OrdinalIgnoreCase))
                 multiplier = 1000*1000;
-            if (energy.EndsWith("GW", StringComparison.OrdinalIgnoreCase))
+            if (energy.EndsWith("GW", StringComparison.OrdinalIgnoreCase) ||
+                energy.EndsWith("GJ", StringComparison.OrdinalIgnoreCase))
                 multiplier = 1000 * 1000 * 1000;
 
             Regex filter = new Regex("^[0-9,.-]+");

@@ -111,7 +111,7 @@ namespace FactorioCalculator.Models.Factory
                     usedRecipes.Add(new Tuple<Recipe, double>(recipe, value));
             }
 
-            var sortedRecipes = usedRecipes.SortTopological((a, b) => a.Item1.Results.Select((i) => i.Item).Intersect(b.Item1.Ingredients.Select((i) => i.Item)).Any());
+            var sortedRecipes = usedRecipes.SortTopological((a, b) => a.Item1.Results.Select((i) => i.Item).Intersect(b.Item1.Ingredients.Select((i) => i.Item)).Any(), true);
             List<SourceStep> inputSteps = new List<SourceStep>();
             List<SinkStep> outputSteps = new List<SinkStep>();
             List<SinkStep> wasteSteps = new List<SinkStep>();
@@ -141,19 +141,33 @@ namespace FactorioCalculator.Models.Factory
 
             foreach (var recipe in sortedRecipes)
             {
-                var previous = recipe.Item1.Ingredients.Select((i) => i.Item).Select((i) => itemSteps[i]);
-                var step = new TransformStep(recipe.Item1, recipe.Item2);
-                foreach (var prev in previous)
-                    step.Previous.Add(prev);
-
-                foreach (var amount in recipe.Item1.Results)
+                foreach (var result in recipe.Item1.Results)
                 {
-                    var item = amount.Item;
-                    if(!itemSteps.ContainsKey(item)){
+                    var item = result.Item;
+                    if (!itemSteps.ContainsKey(item))
+                    {
                         var flowstep = new FlowStep(new ItemAmount(item, 0));
                         itemSteps.Add(item, flowstep);
                         flowSteps.Add(flowstep);
                     }
+                }
+            }
+
+            foreach (var recipe in sortedRecipes)
+            {
+                var previous = recipe.Item1.Ingredients.Select((i) => i.Item);
+                var next = recipe.Item1.Results.Select((i) => i.Item);
+                var step = new TransformStep(recipe.Item1, recipe.Item2);
+                foreach (var item in previous)
+                {
+                    var prev = itemSteps[item];
+                    step.Previous.Add(prev);
+                }
+                
+                foreach (var amount in recipe.Item1.Results)
+                {
+                    var item = amount.Item;
+                    
                     itemSteps[item].Previous.Add(step);
                     itemSteps[item].Item += amount * recipe.Item2;
                 }

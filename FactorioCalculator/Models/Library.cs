@@ -34,6 +34,68 @@ namespace FactorioCalculator.Models
             BestRecipe = new Dictionary<Item, RecipeGraph>();
         }
 
+        public void AddPowerPseudoItems()
+        {
+            Item joule = new Item("joule");
+            AddItem(joule);
+            Item water = _items.Where((i) => i.Name == "water").First();
+            Item warmWater = new Item("water-warm");
+            AddItem(warmWater);
+
+            Building boiler = _buildings.Where((b) => b.Name == "boiler").First();
+            boiler.CraftingCategories.Add("boiling");
+            
+            double boilerPower = 390 * 1000;
+            double boilerEffectivity = 0.5;
+            double waterHeatCapacity = 1000;
+            double waterNormalTemp = 15;
+            double waterMaxTemp = 100;
+            double waterTempDiff = waterMaxTemp - waterNormalTemp;
+            double warmWaterEnergy = waterHeatCapacity * waterTempDiff;
+
+            boiler.ProductionSpeed = boilerEffectivity;
+
+            foreach (var item in _items.Where((i) => i.FuelValue > 0))
+            {
+                double expectedEnergy = item.FuelValue * boilerEffectivity;
+                double burnTime = expectedEnergy / boilerPower;
+                Recipe burnRecipe = new Recipe("burn-" + item.Name)
+                {
+                    CraftingCategory = "boiling",
+                    Time = burnTime / boilerEffectivity,
+                };
+                double waterAmount = expectedEnergy / warmWaterEnergy;
+                burnRecipe.AddIngredient(new ItemAmount(water, waterAmount));
+                burnRecipe.AddIngredient(new ItemAmount(item, 1));
+                burnRecipe.AddResult(new ItemAmount(warmWater, waterAmount));
+                AddRecipe(burnRecipe);
+            }
+
+            Building steamEngine = _buildings.Where((b) => b.Name == "steam-engine").First();
+            steamEngine.CraftingCategories.Add("generator");
+
+            Recipe generatorRecipe = new Recipe("generator-water")
+            {
+                CraftingCategory = "generator",
+            };
+            double generatorPower = 510 * 1000;
+            generatorRecipe.AddIngredient(new ItemAmount(warmWater, generatorPower / warmWaterEnergy));
+            generatorRecipe.AddResult(new ItemAmount(joule, generatorPower));
+            generatorRecipe.Time = 1 / (0.1 * 60); // Generators use 0.1 water per tick.
+            AddRecipe(generatorRecipe);
+            var energyConversion = new Dictionary<string, double>() {
+                {"crafting", 200 * 1000}, // Rough estimate of power use of all assembling machines divided by efficiency
+                {"oil-processing", 420 * 1000},
+                {"chemistry", 210 / 1.25 * 1000},
+            };
+
+            foreach(var conversion in energyConversion)
+                foreach (var recipe in _recipes.Where((r) => r.CraftingCategory == conversion.Key))
+                {
+                    recipe.AddIngredient(new ItemAmount(joule, conversion.Value * recipe.Time)); 
+                }
+        }
+
         public void AddItem(Item item)
         {
             item.Initialize(this);

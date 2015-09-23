@@ -20,6 +20,7 @@ namespace FactorioCalculator
         {
             ModImporter a = new ModImporter(@"C:\Program Files\Factorio", "base");
             a.Load();
+            a.Library.AddPowerPseudoItems();
 
             //var assembler = a.Library.Buildings.Where((b) => b.Name == "assembling-machine-1").First();
             //var recipe = a.Library.Recipes.Where((r) => r.Name == "light-oil").First();
@@ -32,6 +33,7 @@ namespace FactorioCalculator
             var oil = a.Library.Items.Where((i) => i.Name == "crude-oil").First();
             var water = a.Library.Items.Where((i) => i.Name == "water").First();
             var electronicCircuit = a.Library.Items.Where((i) => i.Name == "electronic-circuit").First();
+            var science1 = a.Library.Items.Where((i) => i.Name == "science-pack-1").First();
             var science2 = a.Library.Items.Where((i) => i.Name == "science-pack-2").First();
             var science3 = a.Library.Items.Where((i) => i.Name == "science-pack-3").First();
             var advancedCircuit = a.Library.Items.Where((i) => i.Name == "advanced-circuit").First();
@@ -40,7 +42,7 @@ namespace FactorioCalculator
             
             var graph = RecipeGraph.FromLibrary(a.Library,
                 new Item[] { copperPlate, ironPlate, coal, oil, alienArtifact, stone, water },
-                new ItemAmount[] { new ItemAmount(science3, 1) },
+                new ItemAmount[] { new ItemAmount(science1, 0.5), new ItemAmount(science2, 0.5), new ItemAmount(science3, 0.5) },
                 (r) => 1);
 
             graph.Children.PrintDot();
@@ -49,7 +51,7 @@ namespace FactorioCalculator
             //Console.WriteLine(a.Library.RecipeChains.Last().Value.First().Waste);
 
             
-            var solution = new TrivialSolutionFactory(a.Library, graph.Children);
+            //var solution = new TrivialSolutionFactory(a.Library, graph.Children);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
