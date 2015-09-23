@@ -17,7 +17,7 @@ namespace FactorioCalculator.Models
             get
             {
                 var sameCategory = _library.Buildings.Where((b) => b.CraftingCategories.Contains(CraftingCategory));
-                var enoughCapacity = sameCategory.Where((b) => b.IngredientCount >= Ingredients.Count());
+                var enoughCapacity = sameCategory.Where((b) => b.IngredientCount >= Ingredients.Where((i) => !i.Item.IsVirtual).Count());
                 var result = enoughCapacity;
                 if (Ingredients.Any((i) => i.Item.ItemType == ItemType.Fluid))
                     result = result.Where((b) => b.Fluidboxes.Any((z) => z.IsOutput == false));

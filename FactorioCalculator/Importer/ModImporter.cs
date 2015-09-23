@@ -147,6 +147,8 @@ namespace FactorioCalculator.Importer
                     {
                         var categories = entity["crafting_categories"] as LuaTable;
                         result.CraftingCategories.AddRange(categories.Values.OfType<string>());
+                        if (result.CraftingCategories.Contains("smelting"))
+                            result.IngredientCount = 1;
                     }
 
                     if (entity.ContainsKey("crafting_speed"))

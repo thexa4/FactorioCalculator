@@ -36,10 +36,10 @@ namespace FactorioCalculator.Models
 
         public void AddPowerPseudoItems()
         {
-            Item joule = new Item("joule");
+            Item joule = new Item("joule") { IsVirtual = true };
             AddItem(joule);
             Item water = _items.Where((i) => i.Name == "water").First();
-            Item warmWater = new Item("water-warm");
+            Item warmWater = new Item("water-warm") { IsVirtual = true };
             AddItem(warmWater);
 
             Building boiler = _buildings.Where((b) => b.Name == "boiler").First();
@@ -73,6 +73,8 @@ namespace FactorioCalculator.Models
 
             Building steamEngine = _buildings.Where((b) => b.Name == "steam-engine").First();
             steamEngine.CraftingCategories.Add("generator");
+            steamEngine.ProductionSpeed = 1;
+            steamEngine.IngredientCount = 1;
 
             Recipe generatorRecipe = new Recipe("generator-water")
             {
