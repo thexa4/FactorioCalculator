@@ -14,6 +14,7 @@ namespace FactorioCalculator.Models
         public double ProductionSpeed { get; set; }
         public List<string> CraftingCategories { get; protected set; }
         public IEnumerable<Recipe> Recipes { get { return _library.Recipes.Where((p) => p.Buildings.Contains(this)); } }
+        public string IconPath { get; set; }
         public double Energy { get; set; }
         public int IngredientCount { get; set; }
         public EnergySource EnergySource { get; set; }

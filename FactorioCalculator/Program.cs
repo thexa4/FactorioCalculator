@@ -2,6 +2,8 @@
 using FactorioCalculator.Importer;
 using FactorioCalculator.Models;
 using FactorioCalculator.Models.Factory;
+using FactorioCalculator.Models.Factory.Physical;
+using FactorioCalculator.Models.PlaceRoute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,9 +87,25 @@ namespace FactorioCalculator
 
             //var solution = new TrivialSolutionFactory(a.Library, graph.Children);
 
+            var refinery = a.Library.Buildings.Where((b) => b.Name == "oil-refinery").First();
+            var chemical = a.Library.Buildings.Where((b) => b.Name == "chemical-plant").First();
+            var pipe = a.Library.Buildings.Where((b) => b.Name == "pipe").First();
+            var pipeToGround = a.Library.Buildings.Where((b) => b.Name == "pipe-to-ground").First();
+
+            var space = new SearchSpace(new Vector2(16, 16));
+            space = space.AddComponent(new ProductionBuilding(refinery.Recipes.First(), 0.1, refinery, Vector2.Zero, BuildingRotation.East));
+            space = space.AddComponent(new ProductionBuilding(chemical.Recipes.First(), 0.1, chemical, new Vector2(9, 12), BuildingRotation.North));
+
+            var router = new FluidRouter();
+            router.Pipe = pipe;
+            router.PipeToGround = pipeToGround;
+
+            space = router.Route(new ItemAmount(water, 1), space, new Vector2(4, 4), BuildingRotation.South, new List<Vector2>() { new Vector2(9, 12) });
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            
+            Application.Run(new Form1(space.Draw()));
         }
     }
 }

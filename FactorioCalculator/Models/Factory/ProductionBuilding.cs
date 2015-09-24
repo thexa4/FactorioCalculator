@@ -4,12 +4,15 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FactorioCalculator.Helper;
 
 namespace FactorioCalculator.Models.Factory
 {
     class ProductionBuilding : ProductionStep, IPhysicalBuilding
     {
         public Vector2 Position { get; protected set; }
+        public Vector2 Size { get; protected set; }
+        public BuildingRotation Rotation { get; protected set; }
         public IEnumerable<FluidBox> FluidBoxes
         {
             get
@@ -25,10 +28,12 @@ namespace FactorioCalculator.Models.Factory
             }
         }
 
-        public ProductionBuilding(Recipe recipe, double amount, Building building, Vector2 position)
+        public ProductionBuilding(Recipe recipe, double amount, Building building, Vector2 position, BuildingRotation rotation)
             : base(recipe, amount, building)
         {
             Position = position;
+            Size = building.Size.RotateAbsolute(rotation);
+            Rotation = rotation;
         }
     }
 }

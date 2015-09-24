@@ -31,13 +31,15 @@ namespace FactorioCalculator.Importer
             ModName = modName;
         }
 
+        public DirectoryInfo AppDataFolder { get { return new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FactorioCalculator")); } }
+
         public void Load()
         {
             using(var lua = new Lua())
             {
                 var corepath = Path.Combine(FactorioPath, "data", "core");
 
-                var appdata = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FactorioCalculator"));
+                var appdata = AppDataFolder; 
                 if (!appdata.Exists)
                     appdata.Create();
 
@@ -113,6 +115,7 @@ namespace FactorioCalculator.Importer
                     var name = entity["name"] as string;
 
                     var result = new Building(name);
+                    result.IconPath = ((string)entity["icon"]).Replace("__base__", AppDataFolder.FullName);
 
                     if (entity.ContainsKey("selection_box"))
                     {

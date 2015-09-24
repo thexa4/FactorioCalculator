@@ -17,6 +17,14 @@ namespace FactorioCalculator.Models.Factory
         /// </summary>
         Vector2 Position { get; }
         /// <summary>
+        /// The size of the building
+        /// </summary>
+        Vector2 Size { get; }
+        /// <summary>
+        /// The rotation of the building
+        /// </summary>
+        BuildingRotation Rotation { get; }
+        /// <summary>
         /// The placable building
         /// </summary>
         Building Building { get; }

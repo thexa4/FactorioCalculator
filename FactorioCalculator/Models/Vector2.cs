@@ -56,6 +56,11 @@ namespace FactorioCalculator.Models
         {
             return this / other;
         }
+
+        public Vector2 Transpose()
+        {
+            return new Vector2(Y, X);
+        }
         #endregion
         #region Operators
         public static Vector2 operator *(double multiplier, Vector2 other)
