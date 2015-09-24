@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,26 +43,18 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public IEnumerable<IPhysicalBuilding> CalculateCollisions(Vector2 pos)
         {
-            foreach (var building in Buildings)
-            {
-                var translated = building.Position - pos;
-                if (translated.X > 0 || translated.Y > 0)
-                    continue;
-                if (translated.X < building.Size.X || translated.Y < building.Size.Y)
-                    continue;
-                yield return building;
-            }
+            return CalculateCollisions(pos, Vector2.One);
         }
 
         public IEnumerable<IPhysicalBuilding> CalculateCollisions(Vector2 pos, Vector2 size) {
+            RectangleF source = new RectangleF((float)pos.X, (float)pos.Y, (float)size.X, (float)size.Y);
             foreach (var building in Buildings)
             {
-                var translated = building.Position - pos;
-                if (translated.X > size.X || translated.Y > size.Y)
-                    continue;
-                if (translated.X < building.Size.X || translated.Y < building.Size.Y)
-                    continue;
-                yield return building;
+                RectangleF test = new RectangleF((float)building.Position.X, (float)building.Position.Y,
+                    (float)building.Size.X, (float)building.Size.Y);
+
+                if (source.IntersectsWith(test))
+                    yield return building;
             }
         }
 

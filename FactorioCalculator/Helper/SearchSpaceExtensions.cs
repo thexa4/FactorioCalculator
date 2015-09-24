@@ -22,13 +22,17 @@ namespace FactorioCalculator.Helper
 
                 foreach (var item in space.Buildings)
                 {
-                    var icon = Image.FromFile(item.Building.IconPath);
-                    var destination = new Rectangle((int)item.Position.X * cellSize,
+                    if (item.Building.IconPath != null)
+                    {
+                        var destination = new Rectangle((int)item.Position.X * cellSize,
                         (int)item.Position.Y * cellSize, (int)item.Size.X * cellSize,
                         (int)item.Size.Y * cellSize);
-                    
-                    g.FillRectangle(buildingBrush, destination);
-                    g.DrawImage(icon, destination);
+
+                        g.FillRectangle(buildingBrush, destination);
+
+                        var icon = Image.FromFile(item.Building.IconPath);
+                        g.DrawImage(icon, destination);
+                    }
                 }
             }
 

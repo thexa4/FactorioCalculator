@@ -10,7 +10,7 @@ namespace FactorioCalculator.Models.Factory.Physical
     {
         public Depth FlowDepth { get; set; }
 
-        public UndergroundFlow(ItemAmount item, Vector2 position, Depth depth, BuildingRotation rotation) : base(item, null, position, rotation) {
+        public UndergroundFlow(ItemAmount item, Vector2 position, Depth depth, BuildingRotation rotation) : base(item, new Building("underground-flow"), position, rotation) {
             Position = position;
             FlowDepth = depth;
             Rotation = rotation;

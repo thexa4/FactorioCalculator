@@ -70,15 +70,16 @@ namespace FactorioCalculator
             };
 
             
-            var graph = RecipeGraph.FromLibrary(a.Library,
+            /*var graph = RecipeGraph.FromLibrary(a.Library,
                 new Item[] { copperPlate, ironPlate, coal, oil, alienArtifact, stone, water },
                 results.Select((s) => new ItemAmount(a.Library.Items.Where((i) => i.Name == s.Key.ToLowerInvariant()).First(), s.Value)),
                 (r) => 1);
 
+             */
             //graph.Children.PrintDot();
 
-            var result = TrivialSolutionFactory.CreateFactory(graph);
-            result.Children.PrintDot();
+            //var result = TrivialSolutionFactory.CreateFactory(graph);
+            //result.Children.PrintDot();
 
             //TrivialSolutionFactory.GenerateProductionLayer(a.Library, item, 2).PrintDot();
 
@@ -101,6 +102,7 @@ namespace FactorioCalculator
             router.PipeToGround = pipeToGround;
 
             space = router.Route(new ItemAmount(water, 1), space, new Vector2(4, 4), BuildingRotation.South, new List<Vector2>() { new Vector2(9, 12) });
+            space = router.Route(new ItemAmount(oil, 1), space, new Vector2(1, 4), BuildingRotation.South, new List<Vector2>() { new Vector2(12, 12) });
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
