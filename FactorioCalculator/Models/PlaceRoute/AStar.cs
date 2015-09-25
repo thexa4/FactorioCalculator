@@ -15,6 +15,7 @@ namespace FactorioCalculator.Models.PlaceRoute
         public T EndState { get; private set; }
 
         public Func<T, IEnumerable<T>> StateGenerator { get; set; }
+        public Func<T, HashSet<Vector2>, bool> EndStateValidator { get; set; }
 
         public AStar(double distanceCost = 10)
         {
@@ -38,6 +39,9 @@ namespace FactorioCalculator.Models.PlaceRoute
             foreach (var newState in StateGenerator(state))
             {
                 var guessedCost = newState.Cost + CostHeuristic(newState.Position);
+                if (newState.Position.X < 0 || newState.Position.Y < 0
+                    || newState.Position.X >= newState.Space.Size.X || newState.Position.Y >= newState.Space.Size.Y)
+                    continue;
                 _queue.Enqueue(new AStarState(newState), guessedCost);
             }
         }
@@ -45,7 +49,7 @@ namespace FactorioCalculator.Models.PlaceRoute
         public bool Step()
         {
             var state = _queue.Dequeue().State;
-            if (_destinations.Contains(state.Position))
+            if (EndStateValidator(state, _destinations))
             {
                 EndState = state;
                 return true;

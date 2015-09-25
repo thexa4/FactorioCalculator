@@ -123,6 +123,7 @@ namespace FactorioCalculator.Importer
                         var v1 = (selectionBox[1.0] as LuaTable).ToVector2();
                         var v2 = (selectionBox[2.0] as LuaTable).ToVector2();
                         result.Size = v2 - v1;
+                        result.Size = new Vector2(Math.Ceiling(result.Size.X), Math.Ceiling(result.Size.Y));
                     }
 
                     if (entity.ContainsKey("fluid_boxes"))

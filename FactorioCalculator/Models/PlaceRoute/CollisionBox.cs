@@ -24,5 +24,10 @@ namespace FactorioCalculator.Models.PlaceRoute
             _size = step.Size;
             _step = step;
         }
+
+        public override string ToString()
+        {
+            return string.Format("Collision<{0}>", _step);
+        }
     }
 }

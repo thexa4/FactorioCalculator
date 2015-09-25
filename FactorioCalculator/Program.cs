@@ -94,15 +94,41 @@ namespace FactorioCalculator
             var pipeToGround = a.Library.Buildings.Where((b) => b.Name == "pipe-to-ground").First();
 
             var space = new SearchSpace(new Vector2(16, 16));
-            space = space.AddComponent(new ProductionBuilding(refinery.Recipes.First(), 0.1, refinery, Vector2.Zero, BuildingRotation.East));
-            space = space.AddComponent(new ProductionBuilding(chemical.Recipes.First(), 0.1, chemical, new Vector2(9, 12), BuildingRotation.North));
+            var refBuilding = new ProductionBuilding(refinery.Recipes.First(), 0.1, refinery, Vector2.One, BuildingRotation.East);
+            var chemBuilding = new ProductionBuilding(chemical.Recipes.First(), 0.1, chemical, new Vector2(6, 11), BuildingRotation.North);
+            space = space.AddComponent(refBuilding);
+            space = space.AddComponent(chemBuilding);
+
+            var grader = new SolutionGrader();
 
             var router = new FluidRouter();
+            router.Grader = grader;
             router.Pipe = pipe;
             router.PipeToGround = pipeToGround;
 
-            space = router.Route(new ItemAmount(water, 1), space, new Vector2(4, 4), BuildingRotation.South, new List<Vector2>() { new Vector2(9, 12) });
-            space = router.Route(new ItemAmount(oil, 1), space, new Vector2(1, 4), BuildingRotation.South, new List<Vector2>() { new Vector2(12, 12) });
+            var solid = new SolidRouter();
+            solid.Grader = grader;
+            solid.Belt = a.Library.Buildings.Where((b) => b.Name == "basic-transport-belt").First();
+            solid.BeltGroundNormal = a.Library.Buildings.Where((b) => b.Name == "basic-transport-belt-to-ground").First();
+            solid.BeltGroundFast = a.Library.Buildings.Where((b) => b.Name == "fast-transport-belt-to-ground").First();
+            solid.BeltGroundExpress = a.Library.Buildings.Where((b) => b.Name == "express-transport-belt-to-ground").First();
+            solid.FastInserter = a.Library.Buildings.Where((b) => b.Name == "fast-inserter").First();
+            solid.Inserter = a.Library.Buildings.Where((b) => b.Name == "basic-inserter").First();
+            solid.LongInserter = a.Library.Buildings.Where((b) => b.Name == "long-handed-inserter").First();
+
+            space = router.Route(new ItemAmount(water, 1), space, new Vector2(2, 3), BuildingRotation.West, new List<Vector2>() { new Vector2(8, 12) });
+            space = router.Route(new ItemAmount(oil, 1), space, new Vector2(4, 3), BuildingRotation.East, new List<Vector2>() { new Vector2(7, 13) });
+            List<Vector2> startPoints = new List<Vector2>();
+            for (int x = 0; x < 4; x++)
+                for (int y = 0; y < 4; y++)
+                    startPoints.Add(refBuilding.Position + new Vector2(x, y));
+
+            List<Vector2> destinations = new List<Vector2>();
+            for (int x = 0; x < 3; x++)
+                for (int y = 0; y < 3; y++)
+                    destinations.Add(chemBuilding.Position + new Vector2(x, y));
+
+            space = solid.Route(new ItemAmount(coal, 0.1), space, startPoints, destinations);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

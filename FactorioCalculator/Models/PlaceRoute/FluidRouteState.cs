@@ -31,9 +31,12 @@ namespace FactorioCalculator.Models.PlaceRoute
         public bool HasJustSurfaced { get { return _hasJustSurfaced; } }
         private bool _hasJustSurfaced;
 
+        public int UndergroundLength { get { return _undergroundLength; } }
+        private int _undergroundLength;
+
         public FlowBuilding FlowBuilding { get { return _building as FlowBuilding; } }
 
-        public FluidRouteState(IPhysicalBuilding building, double cost, Vector2 position, SearchSpace space, Depth depth = Depth.None, BuildingRotation direction = BuildingRotation.North, bool hasJustSurfaced = false)
+        public FluidRouteState(IPhysicalBuilding building, double cost, Vector2 position, SearchSpace space, Depth depth = Depth.None, BuildingRotation direction = BuildingRotation.North, bool hasJustSurfaced = false, int undergroundLength = 0)
         {
             _building = building;
             _cost = cost;
@@ -42,21 +45,25 @@ namespace FactorioCalculator.Models.PlaceRoute
             _depth = depth;
             _direction = direction;
             _hasJustSurfaced = hasJustSurfaced;
+            _undergroundLength = undergroundLength;
         }
 
-        public IEnumerable<FluidRouteState> NextStates(Func<FluidRouteState, IPhysicalBuilding, double> costFunction, Building pipeToGround, Building pipe)
+        public IEnumerable<FluidRouteState> NextStates(Func<SearchSpace, IPhysicalBuilding, double> costFunction, Building pipeToGround, Building pipe)
         {
             if (_depth == Depth.Fluid)
             {
                 Vector2 nextPos = _position + _direction.ToVector();
 
-                // Continue
-                var flow = new UndergroundFlow(FlowBuilding.Item, nextPos, Depth.Fluid, _direction);
-                yield return new FluidRouteState(flow, _cost + costFunction(this, flow), flow.Position, _space.AddRoute(flow), flow.FlowDepth, flow.Rotation);
+                if (_undergroundLength < 9)
+                {
+                    // Continue
+                    var flow = new UndergroundFlow(FlowBuilding.Item, nextPos, Depth.Fluid, _direction);
+                    yield return new FluidRouteState(flow, _cost + costFunction(_space, flow), flow.Position, _space.AddRoute(flow), flow.FlowDepth, flow.Rotation, false, _undergroundLength + 1);
+                }
 
                 // Surface
                 var surface = new FlowBuilding(FlowBuilding.Item, pipeToGround, nextPos, _direction.Invert());
-                yield return new FluidRouteState(surface, _cost + costFunction(this, surface), surface.Position, _space.AddRoute(surface), Depth.None, _direction, true);
+                yield return new FluidRouteState(surface, _cost + costFunction(_space, surface), surface.Position, _space.AddRoute(surface), Depth.None, _direction, true);
             }
             else
             {
@@ -65,11 +72,11 @@ namespace FactorioCalculator.Models.PlaceRoute
                     Vector2 nextPos = _position + _direction.ToVector();
                     // Continue
                     var cont = new FlowBuilding(FlowBuilding.Item, pipe, nextPos, BuildingRotation.North);
-                    yield return new FluidRouteState(cont, _cost + costFunction(this, cont), cont.Position, _space.AddRoute(cont));
+                    yield return new FluidRouteState(cont, _cost + costFunction(_space, cont), cont.Position, _space.AddRoute(cont));
 
                     // Dive
                     var dive = new FlowBuilding(FlowBuilding.Item, pipeToGround, nextPos, _direction);
-                    yield return new FluidRouteState(dive, _cost + costFunction(this, dive), dive.Position, _space.AddRoute(dive), Depth.Fluid, _direction);
+                    yield return new FluidRouteState(dive, _cost + costFunction(_space, dive), dive.Position, _space.AddRoute(dive), Depth.Fluid, _direction);
 
                 }
                 else
@@ -81,11 +88,11 @@ namespace FactorioCalculator.Models.PlaceRoute
 
                         // Straight
                         var cont = new FlowBuilding(FlowBuilding.Item, pipe, nextPos, BuildingRotation.North);
-                        yield return new FluidRouteState(cont, _cost + costFunction(this, cont), cont.Position, _space.AddRoute(cont));
+                        yield return new FluidRouteState(cont, _cost + costFunction(_space, cont), cont.Position, _space.AddRoute(cont));
 
                         // Dive
                         var dive = new FlowBuilding(FlowBuilding.Item, pipeToGround, nextPos, rotation);
-                        yield return new FluidRouteState(dive, _cost + costFunction(this, dive), dive.Position, _space.AddRoute(dive), Depth.Fluid, rotation);
+                        yield return new FluidRouteState(dive, _cost + costFunction(_space, dive), dive.Position, _space.AddRoute(dive), Depth.Fluid, rotation);
                     }
                 }
             }

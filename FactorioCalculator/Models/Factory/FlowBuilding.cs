@@ -24,5 +24,10 @@ namespace FactorioCalculator.Models.Factory
             Size = building.Size.RotateAbsolute(rotation);
             Rotation = rotation;
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0}<{1}>", Building.Name, Item);
+        }
     }
 }
