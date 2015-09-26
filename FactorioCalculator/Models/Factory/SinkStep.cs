@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.Factory
 {
-    class SinkStep : FlowStep
+    public class SinkStep : FlowStep
     {
         public SinkStep(ItemAmount amount)
             : base(amount)

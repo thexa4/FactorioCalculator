@@ -17,10 +17,10 @@ namespace FactorioCalculator.Models.PlaceRoute
         public Func<T, IEnumerable<T>> StateGenerator { get; set; }
         public Func<T, HashSet<Vector2>, bool> EndStateValidator { get; set; }
 
-        public AStar(double distanceCost = 10)
+        public AStar(double distanceCost = 5)
         {
             DistanceCost = distanceCost;
-            _queue = new HeapPriorityQueue<AStarState>(1000 * 1000);
+            _queue = new HeapPriorityQueue<AStarState>(100 * 1000);
         }
 
         public void AddDestination(Vector2 position)
@@ -39,15 +39,15 @@ namespace FactorioCalculator.Models.PlaceRoute
             foreach (var newState in StateGenerator(state))
             {
                 var guessedCost = newState.Cost + CostHeuristic(newState.Position);
-                if (newState.Position.X < 0 || newState.Position.Y < 0
-                    || newState.Position.X >= newState.Space.Size.X || newState.Position.Y >= newState.Space.Size.Y)
-                    continue;
                 _queue.Enqueue(new AStarState(newState), guessedCost);
             }
         }
 
         public bool Step()
         {
+            if (_queue.Count == 0)
+                throw new InvalidOperationException("No route found!");
+
             var state = _queue.Dequeue().State;
             if (EndStateValidator(state, _destinations))
             {

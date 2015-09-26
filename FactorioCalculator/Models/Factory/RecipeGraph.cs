@@ -12,7 +12,7 @@ using System.Globalization;
 
 namespace FactorioCalculator.Models.Factory
 {
-    class RecipeGraph : IStep
+    public class RecipeGraph : IStep
     {
         public IStep Parent { get; set; }
 

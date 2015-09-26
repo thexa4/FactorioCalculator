@@ -10,7 +10,7 @@ namespace FactorioCalculator.Models.Factory
     /// <summary>
     /// Represents a placable building on the map
     /// </summary>
-    interface IPhysicalBuilding : IStep
+    public interface IPhysicalBuilding : IStep
     {
         /// <summary>
         /// The top left position of the building

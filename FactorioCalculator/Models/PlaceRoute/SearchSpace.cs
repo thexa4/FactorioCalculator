@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.PlaceRoute
 {
-    struct SearchSpace
+    public struct SearchSpace
     {
         public ImmutableList<CollisionBox<ProductionBuilding>> Components { get { return _components; } }
         public ImmutableList<CollisionBox<FlowBuilding>> Routes { get { return _routes; } }

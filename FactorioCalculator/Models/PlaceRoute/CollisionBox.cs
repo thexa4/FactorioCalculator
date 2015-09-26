@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.PlaceRoute
 {
-    struct CollisionBox<T> where T : IPhysicalBuilding
+    public struct CollisionBox<T> where T : IPhysicalBuilding
     {
         public Vector2 Position { get { return _position; } }
         public Vector2 Size { get { return _size; } }

@@ -10,7 +10,7 @@ namespace FactorioCalculator.Models.Factory
     /// <summary>
     /// Represents a spawn point of a certain resource
     /// </summary>
-    class SourceStep : FlowStep
+    public class SourceStep : FlowStep
     {
         public SourceStep(ItemAmount amount)
             : base(amount)

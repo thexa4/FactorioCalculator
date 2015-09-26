@@ -8,22 +8,55 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.PlaceRoute
 {
-    class SolutionGrader
+    public class SolutionGrader
     {
         public Dictionary<string, double> CostLookup = new Dictionary<string, double>(){
-            {"long-handed-inserter", 4},
-            {"fast-inserter", 10},
-            {"basic-belt-to-ground", 4},
-            {"pipe-to-ground", 5},
+            {"long-handed-inserter", 18},
+            {"fast-inserter", 20},
+            {"basic-inserter", 8},
+            {"basic-belt-to-ground", 20},
+            {"pipe-to-ground", 20},
+            //{"underground-flow", -1},
         };
 
+        public double ProductionCollisionCost = 1000;
         public double TouchLeakCost = 50;
         public double CollisionCost = 200;
         public double LandUseCost = 1;
+        public double EdgeUseCost = 200;
+        public double AreaCost = 1;
+
+        public double CostForSolution(SearchSpace state)
+        {
+            double cost = 0;
+            cost += state.Size.X * state.Size.Y * AreaCost;
+
+            foreach(var production in state.Buildings)
+                foreach(var collision in state.CalculateCollisions(production.Position, production.Size))
+                {
+                    if (collision == production)
+                        continue;
+                    if (collision is ProductionBuilding)
+                        cost += ProductionCollisionCost;
+                }
+
+            foreach (var route in state.Routes)
+                cost += CostForBuilding(state, route.Step);
+            return cost;
+        }
 
         public double CostForBuilding(SearchSpace state, IPhysicalBuilding building)
         {
             double cost = building.Size.X * building.Size.Y * LandUseCost;
+
+            if (building.Position.X <= 0 && building.Rotation != BuildingRotation.West && building.Rotation != BuildingRotation.East)
+                cost += EdgeUseCost;
+            if (building.Position.Y <= 0 && building.Rotation != BuildingRotation.North && building.Rotation != BuildingRotation.South)
+                cost += EdgeUseCost;
+            if (building.Position.X >= state.Size.X - building.Size.X && building.Rotation != BuildingRotation.East && building.Rotation != BuildingRotation.West)
+                cost += EdgeUseCost;
+            if (building.Position.Y >= state.Size.Y - building.Size.Y && building.Rotation != BuildingRotation.South && building.Rotation != BuildingRotation.North)
+                cost += EdgeUseCost; 
 
             if (CostLookup.ContainsKey(building.Building.Name))
                 cost += CostLookup[building.Building.Name];
@@ -76,6 +109,30 @@ namespace FactorioCalculator.Models.PlaceRoute
 
 
                     cost += misMatch.Count() * TouchLeakCost;
+                }
+            }
+            else if (building.Building.Name == "placed-item")
+            {
+                var converted = building as FlowBuilding;
+                var above = collisions.Where((b) => !(b is UndergroundFlow));
+                foreach (var contender in above)
+                {
+                    if (contender is ProductionBuilding)
+                    {
+                        var recipe = ((ProductionBuilding)contender).Recipe;
+                        if (!recipe.Ingredients.Where((i) => i.Item == converted.Item.Item).Any() &&
+                            !recipe.Results.Where((i) => i.Item == converted.Item.Item).Any())
+                            cost += CollisionCost;
+                    }
+                    else if (contender is FlowBuilding)
+                    {
+                        if (((FlowBuilding)contender).Item.Item != converted.Item.Item)
+                            cost += CollisionCost;
+                    }
+                    else
+                    {
+                        cost += CollisionCost;
+                    }
                 }
             }
             else

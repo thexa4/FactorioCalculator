@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models
 {
-    enum BuildingRotation
+    public enum BuildingRotation
     {
         North,
         West,

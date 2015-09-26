@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 namespace FactorioCalculator.Models
 {
     [Serializable]
-    class Recipe : SubModule
+    public class Recipe : SubModule
     {
         public string CraftingCategory { get; set; }
         public IEnumerable<Building> Buildings

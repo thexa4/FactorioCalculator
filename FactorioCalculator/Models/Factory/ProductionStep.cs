@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.Factory
 {
-    class ProductionStep : TransformStep
+    public class ProductionStep : TransformStep
     {
         public Building Building { get; private set; }
 

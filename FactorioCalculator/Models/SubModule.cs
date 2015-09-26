@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace FactorioCalculator.Models
 {
-    class SubModule
+    public class SubModule
     {
         public string Name { get; set; }
         public IEnumerable<ItemAmount> Ingredients { get { return _ingredients; } }

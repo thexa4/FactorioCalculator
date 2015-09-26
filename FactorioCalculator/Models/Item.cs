@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 namespace FactorioCalculator.Models
 {
     [Serializable]
-    class Item
+    public class Item
     {
         public string Name { get; set; }
         public double FuelValue { get; set; }

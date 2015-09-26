@@ -206,6 +206,11 @@ namespace FactorioCalculator.Importer
                 if (properties.ContainsKey("place_result"))
                     result.PlaceResultName = properties["place_result"] as string;
 
+                if (properties.ContainsKey("heat_capacity"))
+                    result.ItemType = ItemType.Fluid;
+                else
+                    result.ItemType = ItemType.Solid;
+
                 if (properties.ContainsKey("fuel_value"))
                     result.FuelValue = ParseEnergy(properties["fuel_value"] as string);
 

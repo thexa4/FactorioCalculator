@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models
 {
-    enum ItemType
+    public enum ItemType
     {
         None = 0,
         Solid = 1,

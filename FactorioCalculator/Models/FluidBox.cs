@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models
 {
-    class FluidBox
+    public class FluidBox
     {
         public bool IsOutput { get; protected set; }
         public Vector2 Position { get; protected set; }

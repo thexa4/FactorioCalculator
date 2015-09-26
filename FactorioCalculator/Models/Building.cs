@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 namespace FactorioCalculator.Models
 {
     [Serializable]
-    class Building
+    public class Building
     {
         public string Name { get; set; }
         public double ProductionSpeed { get; set; }
@@ -34,6 +34,7 @@ namespace FactorioCalculator.Models
             EnergySource = Models.EnergySource.None;
             IngredientCount = 0;
             Fluidboxes = new List<FluidBox>();
+            Size = Vector2.One;
         }
 
         public void Initialize(Library library)

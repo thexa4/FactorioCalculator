@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 namespace FactorioCalculator.Models
 {
     [Serializable]
-    class Library
+    public class Library
     {
         public IEnumerable<Item> Items { get { return _items; } }
         public IEnumerable<Building> Buildings { get { return _buildings; } }

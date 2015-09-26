@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models
 {
-    enum EnergySource
+    public enum EnergySource
     {
         None = 0,
         Electric = 1,

@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 namespace FactorioCalculator.Models
 {
     [Serializable]
-    class ItemAmount
+    public class ItemAmount
     {
         public double Amount { get; protected set; }
         public Item Item

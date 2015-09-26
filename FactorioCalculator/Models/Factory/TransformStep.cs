@@ -10,7 +10,7 @@ namespace FactorioCalculator.Models.Factory
     /// <summary>
     /// Represents a transforming step in the process
     /// </summary>
-    class TransformStep : Step
+    public class TransformStep : Step
     {
         /// <summary>
         /// The recipe to use for the transform

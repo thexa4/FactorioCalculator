@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.PlaceRoute
 {
-    class FluidRouter
+    public class FluidRouter
     {
         public Building PipeToGround;
         public Building Pipe;

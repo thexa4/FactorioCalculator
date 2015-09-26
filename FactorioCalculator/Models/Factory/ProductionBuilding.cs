@@ -8,7 +8,7 @@ using FactorioCalculator.Helper;
 
 namespace FactorioCalculator.Models.Factory
 {
-    class ProductionBuilding : ProductionStep, IPhysicalBuilding
+    public class ProductionBuilding : ProductionStep, IPhysicalBuilding
     {
         public Vector2 Position { get; protected set; }
         public Vector2 Size { get; protected set; }

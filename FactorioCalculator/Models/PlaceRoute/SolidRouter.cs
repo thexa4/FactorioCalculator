@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.PlaceRoute
 {
-    class SolidRouter
+    public class SolidRouter
     {
         public Building Belt;
         public Building BeltGroundNormal;
@@ -31,10 +31,29 @@ namespace FactorioCalculator.Models.PlaceRoute
 
             foreach (var position in startPositions)
             {
-                var startBuilding = new FlowBuilding(item, new Building("placed-item"), position, BuildingRotation.North);
-                space = space.AddRoute(startBuilding);
-                var startState = new SolidRouteState(startBuilding, 0, position, space, TransportState.PlacedItem);
-                star.AddState(startState);
+                if (position.X == 0 || position.Y == 0 || position.X == space.Size.X - 1 || position.Y == space.Size.Y - 1)
+                {
+                    BuildingRotation r = BuildingRotation.North;
+                    if (position.X == 0)
+                        r = BuildingRotation.East;
+                    if (position.Y == 0)
+                        r = BuildingRotation.South;
+                    if (position.X == space.Size.X - 1)
+                        r = BuildingRotation.West;
+                    if (position.Y == space.Size.Y - 1)
+                        r = BuildingRotation.North;
+                    var startBuilding = new FlowBuilding(item, Belt, position, r);
+                    space = space.AddRoute(startBuilding);
+                    var startState = new SolidRouteState(startBuilding, 0, position, space, TransportState.Belt, Depth.None, r);
+                    star.AddState(startState);
+                }
+                else
+                {
+                    var startBuilding = new FlowBuilding(item, new Building("placed-item"), position, BuildingRotation.North);
+                    space = space.AddRoute(startBuilding);
+                    var startState = new SolidRouteState(startBuilding, 0, position, space, TransportState.PlacedItem);
+                    star.AddState(startState);
+                }
             }
 
             while (!star.Step()) { }
@@ -47,8 +66,17 @@ namespace FactorioCalculator.Models.PlaceRoute
             if (!destinations.Contains(state.Position))
                 return false;
 
-            if (state.TransportState == TransportState.PlacedItem)
-                return false;
+            if (state.Position.X <= 0 || state.Position.Y <= 0 | state.Position.X >= state.Space.Size.X - 1 || state.Position.Y >= state.Space.Size.Y - 1)
+            {
+                // Sink node
+                if (state.TransportState != TransportState.Belt)
+                    return false;
+            }
+            else
+            {
+                if (state.TransportState != TransportState.Inserter)
+                    return false;
+            }
 
             return true;
         }

@@ -146,6 +146,7 @@
     <Compile Include="Models\Library.cs" />
     <Compile Include="Models\PlaceRoute\SolidRouter.cs" />
     <Compile Include="Models\PlaceRoute\SolidRouteState.cs" />
+    <Compile Include="Models\PlaceRoute\SolutionGenerator.cs" />
     <Compile Include="Models\PlaceRoute\SolutionGrader.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\ItemAmount.cs" />

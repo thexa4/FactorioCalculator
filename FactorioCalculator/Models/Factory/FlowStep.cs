@@ -10,7 +10,7 @@ namespace FactorioCalculator.Models.Factory
     /// <summary>
     /// Represents a non-transforming flow of items
     /// </summary>
-    class FlowStep : Step
+    public class FlowStep : Step
     {
         public ItemAmount Item { get; set; }
         public FlowStep(ItemAmount item)
