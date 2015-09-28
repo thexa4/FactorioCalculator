@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace FactorioCalculator.Models.Factory
     /// <summary>
     /// Represents a transforming step in the process
     /// </summary>
-    class TransformStep : Step
+    public class TransformStep : Step
     {
         /// <summary>
         /// The recipe to use for the transform
@@ -28,7 +29,7 @@ namespace FactorioCalculator.Models.Factory
 
         public override string ToString()
         {
-            return String.Format("Transform<{0} x {1}>", Recipe.Name, Amount);
+            return String.Format(CultureInfo.InvariantCulture, "Transform<{0} x {1}>", Recipe.Name, Amount);
         }
     }
 }

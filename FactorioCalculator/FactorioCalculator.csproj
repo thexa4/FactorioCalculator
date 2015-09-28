@@ -22,7 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>CodeStyle.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -84,9 +84,13 @@
       <HintPath>..\contrib\Microsoft.Solver.Foundation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Priority Queue">
+      <HintPath>..\packages\OptimizedPriorityQueue.1.0.0.0\lib\net45\Priority Queue.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\System.Collections.Immutable.1.1.37\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -107,32 +111,56 @@
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helper\LuaTableExtensions.cs" />
+    <Compile Include="Helper\SearchSpaceExtensions.cs" />
     <Compile Include="Helper\StepExtensions.cs" />
     <Compile Include="Helper\TopologicalSort.cs" />
     <Compile Include="Helper\TrivialSolutionFactory.cs" />
+    <Compile Include="Helper\VectorExtensions.cs" />
     <Compile Include="Importer\ModImporter.cs" />
     <Compile Include="Models\Building.cs" />
     <Compile Include="Models\BuildingRotation.cs" />
+    <Compile Include="Models\Depth.cs" />
     <Compile Include="Models\EnergySource.cs" />
     <Compile Include="Models\Factory\FlowBuilding.cs" />
     <Compile Include="Models\Factory\FlowStep.cs" />
     <Compile Include="Models\Factory\IPhysicalBuilding.cs" />
     <Compile Include="Models\Factory\IStep.cs" />
+    <Compile Include="Models\Factory\Physical\GroundToUnderground.cs" />
+    <Compile Include="Models\Factory\Physical\UndergroundFlowStep.cs" />
+    <Compile Include="Models\Factory\Physical\VirtualFlowStep.cs" />
     <Compile Include="Models\Factory\ProductionBuilding.cs" />
     <Compile Include="Models\Factory\ProductionStep.cs" />
+    <Compile Include="Models\PlaceRoute\AStar.cs" />
+    <Compile Include="Models\PlaceRoute\CollisionBox.cs" />
+    <Compile Include="Models\PlaceRoute\FluidRouter.cs" />
+    <Compile Include="Models\PlaceRoute\IRouteState.cs" />
+    <Compile Include="Models\PlaceRoute\FluidRouteState.cs" />
+    <Compile Include="Models\PlaceRoute\SearchSpace.cs" />
     <Compile Include="Models\Factory\SinkStep.cs" />
     <Compile Include="Models\Factory\SourceStep.cs" />
     <Compile Include="Models\Factory\TransformStep.cs" />
     <Compile Include="Models\Factory\Step.cs" />
+    <Compile Include="Models\FluidBox.cs" />
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\ItemType.cs" />
     <Compile Include="Models\Library.cs" />
+    <Compile Include="Models\PlaceRoute\RoutingCoord.cs" />
+    <Compile Include="Models\PlaceRoute\SolidRouter.cs" />
+    <Compile Include="Models\PlaceRoute\SolidRouteState.cs" />
+    <Compile Include="Models\PlaceRoute\SolutionGenerator.cs" />
+    <Compile Include="Models\PlaceRoute\SolutionGrader.cs" />
+    <Compile Include="Models\PlaceRoute\SolutionParameters.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\ItemAmount.cs" />
     <Compile Include="Models\Factory\RecipeGraph.cs" />
+    <Compile Include="Models\RecipeLine.cs" />
     <Compile Include="Models\SubModule.cs" />
+    <Compile Include="Models\Vector2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -162,6 +190,11 @@
       <Project>{f55cabbb-4108-4a39-94e1-581fd46dc021}</Project>
       <Name>NLua.Net45</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CustomDictionary.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

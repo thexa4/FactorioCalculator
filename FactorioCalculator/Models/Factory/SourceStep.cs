@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace FactorioCalculator.Models.Factory
     /// <summary>
     /// Represents a spawn point of a certain resource
     /// </summary>
-    class SourceStep : FlowStep
+    public class SourceStep : FlowStep
     {
         public SourceStep(ItemAmount amount)
             : base(amount)
@@ -19,7 +20,7 @@ namespace FactorioCalculator.Models.Factory
 
         public override string ToString()
         {
-            return String.Format("Source<{0}>", Item);
+            return String.Format(CultureInfo.InvariantCulture, "Source<{0}>", Item);
         }
     }
 }

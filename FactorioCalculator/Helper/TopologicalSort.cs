@@ -15,7 +15,7 @@ namespace FactorioCalculator.Helper
         /// <param name="inputs">The inputs to sort</param>
         /// <param name="linksTo">A predicate wether element 1 links to element 2</param>
         /// <returns>A topologically sorted representation</returns>
-        public static IEnumerable<T> SortTopological<T>(this IEnumerable<T> inputs, Func<T, T, bool> linksTo)
+        public static IEnumerable<T> SortTopological<T>(this IEnumerable<T> inputs, Func<T, T, bool> linksTo, bool allowCycles = false)
         {
             Dictionary<T, int> links = new Dictionary<T,int>();
             Dictionary<Tuple<T, T>, bool> linkCache = new Dictionary<Tuple<T, T>, bool>();
@@ -49,11 +49,23 @@ namespace FactorioCalculator.Helper
                     links.Remove(key);
                     foreach (var target in inputs)
                         if (linkCache[new Tuple<T,T>(key, target)])
-                            links[target]--;
+                            if (links.ContainsKey(target))
+                                links[target]--;
                 }
 
                 if (!progress)
-                    throw new ArgumentException("Malformed input, graph contains cycles.");
+                {
+                    if (allowCycles)
+                    {
+                        var lowestKey = links.Keys.OrderBy((k) => links[k]).First();
+                        links[lowestKey] = 0;
+                        continue;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Malformed input, graph contains cycles.");
+                    }
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ using System.Xml.Serialization;
 namespace FactorioCalculator.Models
 {
     [Serializable]
-    class Item
+    public class Item
     {
         public string Name { get; set; }
         public double FuelValue { get; set; }
@@ -16,6 +17,7 @@ namespace FactorioCalculator.Models
         public string PlaceResultName { get; set; }
 
         public bool IsResource { get; set; }
+        public bool IsVirtual { get; set; }
 
         public ItemType ItemType { get; set; }
         public Building PlaceResult
@@ -56,7 +58,7 @@ namespace FactorioCalculator.Models
 
         public override string ToString()
         {
-            return String.Format("Item<{0}>", Name);
+            return String.Format(CultureInfo.InvariantCulture, "Item<{0}>", Name);
         }
     }
 }

@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models
 {
-    public enum EnergySource
+    public enum Depth
     {
         None = 0,
-        Electric = 1,
-        Burner = 2,
+        Fluid = 1,
+        Normal = 2,
+        Fast = 3,
+        Express = 4,
     }
 }

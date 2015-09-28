@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models
 {
-    public enum EnergySource
+    class RecipeLine
     {
-        None = 0,
-        Electric = 1,
-        Burner = 2,
+
     }
 }

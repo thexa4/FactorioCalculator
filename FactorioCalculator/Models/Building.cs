@@ -8,15 +8,19 @@ using System.Xml.Serialization;
 namespace FactorioCalculator.Models
 {
     [Serializable]
-    class Building
+    public class Building
     {
         public string Name { get; set; }
         public double ProductionSpeed { get; set; }
         public List<string> CraftingCategories { get; protected set; }
         public IEnumerable<Recipe> Recipes { get { return _library.Recipes.Where((p) => p.Buildings.Contains(this)); } }
+        public string IconPath { get; set; }
         public double Energy { get; set; }
         public int IngredientCount { get; set; }
         public EnergySource EnergySource { get; set; }
+        public List<FluidBox> Fluidboxes { get; set; }
+        public Vector2 Size { get; set; }
+        public bool HidesFluidBox{ get; set; }
         
         [NonSerialized]
         private Library _library;
@@ -29,6 +33,8 @@ namespace FactorioCalculator.Models
             Energy = 0;
             EnergySource = Models.EnergySource.None;
             IngredientCount = 0;
+            Fluidboxes = new List<FluidBox>();
+            Size = Vector2.One;
         }
 
         public void Initialize(Library library)
@@ -47,7 +53,7 @@ namespace FactorioCalculator.Models
                 return 0;
             if (!CraftingCategories.Contains(recipe.CraftingCategory))
                 return 0;
-            if (recipe.Ingredients.Count() > IngredientCount)
+            if (recipe.Ingredients.Where((i) => !i.Item.IsVirtual).Count() > IngredientCount)
                 return 0;
 
             var duration = recipe.Time / ProductionSpeed;

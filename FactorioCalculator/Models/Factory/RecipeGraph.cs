@@ -8,10 +8,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SolverFoundation.Services;
+using System.Globalization;
 
 namespace FactorioCalculator.Models.Factory
 {
-    class RecipeGraph : IStep
+    public class RecipeGraph : IStep
     {
         public IStep Parent { get; set; }
 
@@ -21,15 +22,26 @@ namespace FactorioCalculator.Models.Factory
         public HashSet<IStep> Previous { get; set; }
 
         public IEnumerable<Item> Waste { get { return _waste.Select((s) => s.Item.Item);  } }
+        public IEnumerable<SinkStep> WasteNodes { get { return _waste; } }
         private List<SinkStep> _waste = new List<SinkStep>();
         public IEnumerable<Item> Inputs { get { return _inputs.Select((s) => s.Item.Item); } }
+        public IEnumerable<SourceStep> InputNodes { get { return _inputs; } }
         private List<SourceStep> _inputs = new List<SourceStep>();
         public IEnumerable<Item> Outputs { get { return _outputs.Select((s) => s.Item.Item); } }
+        public IEnumerable<SinkStep> OutputNodes { get { return _outputs; } }
         private List<SinkStep> _outputs = new List<SinkStep>();
         public IEnumerable<FlowStep> Resources { get { return _resources; } }
         private List<FlowStep> _resources = new List<FlowStep>();
         public IEnumerable<TransformStep> Transformations { get { return _transformations; } }
         private List<TransformStep> _transformations = new List<TransformStep>();
+
+        public IEnumerable<IStep> Children
+        {
+            get
+            {
+                return _waste.Cast<IStep>().Concat(_inputs).Concat(_outputs).Concat(_resources).Concat(_transformations);
+            }
+        }
 
         public RecipeGraph(IEnumerable<SinkStep> waste, IEnumerable<SourceStep> inputs, IEnumerable<SinkStep> outputs, IEnumerable<FlowStep> resources, IEnumerable<TransformStep> transformations)
         {
@@ -41,18 +53,8 @@ namespace FactorioCalculator.Models.Factory
             foreach (var step in _waste.Cast<IStep>().Concat(_inputs).Concat(_outputs).Concat(_resources).Concat(_transformations))
                 step.Parent = this;
         }
-
-        public void PrintDotFormat()
-        {
-            Console.WriteLine("digraph flow {");
-            foreach (var step in _waste.Cast<IStep>().Concat(_inputs).Concat(_outputs).Concat(_resources).Concat(_transformations))
-                foreach (var prev in step.Previous)
-                    Console.WriteLine(String.Format("\"{0}\"\t->\t\"{1}\"\t;", prev, step));
-            Console.WriteLine("}");
-        }
-
         
-        public static RecipeGraph FromLibrary(Library library, IEnumerable<Item> inputs, IEnumerable<ItemAmount> outputs, Func<Item, double> costFunction, double wasteCost)
+        public static RecipeGraph FromLibrary(Library library, IEnumerable<Item> inputs, IEnumerable<ItemAmount> outputs, Func<Item, double> costFunction)
         {
             var solver = new SimplexSolver();
             var itemRows = new Dictionary<Item, int>();
@@ -95,7 +97,7 @@ namespace FactorioCalculator.Models.Factory
             {
                 var row = itemRows[item];
                 solver.SetBounds(row, Rational.NegativeInfinity, 0);
-                solver.AddGoal(row, 10000, false);
+                solver.AddGoal(row, (int)(10000 * costFunction(item)), false);
             }
 
             solver.Solve(new SimplexSolverParams());
@@ -112,7 +114,7 @@ namespace FactorioCalculator.Models.Factory
                     usedRecipes.Add(new Tuple<Recipe, double>(recipe, value));
             }
 
-            var sortedRecipes = usedRecipes.SortTopological((a, b) => a.Item1.Results.Select((i) => i.Item).Intersect(b.Item1.Ingredients.Select((i) => i.Item)).Any());
+            var sortedRecipes = usedRecipes.SortTopological((a, b) => a.Item1.Results.Select((i) => i.Item).Intersect(b.Item1.Ingredients.Select((i) => i.Item)).Any(), true);
             List<SourceStep> inputSteps = new List<SourceStep>();
             List<SinkStep> outputSteps = new List<SinkStep>();
             List<SinkStep> wasteSteps = new List<SinkStep>();
@@ -125,38 +127,50 @@ namespace FactorioCalculator.Models.Factory
                 var value = (double)solver.GetValue(itemRows[item]);
                 if (value > 0)
                 {
-                    var sink = new SinkStep(new ItemAmount(item, value));
+                    var sink = new SinkStep(new ItemAmount(item, value / 2));
                     if (outputs.Select((o) => o.Item).Contains(item))
                         outputSteps.Add(sink);
                     else
                         wasteSteps.Add(sink);
                     itemSteps.Add(item, sink);
-                    Console.WriteLine("sink: " + item);
                 }
                 else if(value < 0)
                 {
                     var source = new SourceStep(new ItemAmount(item, -value));
                     inputSteps.Add(source);
                     itemSteps.Add(item, source);
-                    Console.WriteLine("source: " + item);
                 }
             }
 
             foreach (var recipe in sortedRecipes)
             {
-                var previous = recipe.Item1.Ingredients.Select((i) => i.Item).Select((i) => itemSteps[i]);
-                var step = new TransformStep(recipe.Item1, recipe.Item2);
-                foreach (var prev in previous)
-                    step.Previous.Add(prev);
-
-                foreach (var amount in recipe.Item1.Results)
+                foreach (var result in recipe.Item1.Results)
                 {
-                    var item = amount.Item;
-                    if(!itemSteps.ContainsKey(item)){
+                    var item = result.Item;
+                    if (!itemSteps.ContainsKey(item))
+                    {
                         var flowstep = new FlowStep(new ItemAmount(item, 0));
                         itemSteps.Add(item, flowstep);
                         flowSteps.Add(flowstep);
                     }
+                }
+            }
+
+            foreach (var recipe in sortedRecipes)
+            {
+                var previous = recipe.Item1.Ingredients.Select((i) => i.Item);
+                var next = recipe.Item1.Results.Select((i) => i.Item);
+                var step = new TransformStep(recipe.Item1, recipe.Item2);
+                foreach (var item in previous)
+                {
+                    var prev = itemSteps[item];
+                    step.Previous.Add(prev);
+                }
+                
+                foreach (var amount in recipe.Item1.Results)
+                {
+                    var item = amount.Item;
+                    
                     itemSteps[item].Previous.Add(step);
                     itemSteps[item].Item += amount * recipe.Item2;
                 }

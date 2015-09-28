@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace FactorioCalculator.Models
 {
-    class SubModule
+    public class SubModule
     {
         public string Name { get; set; }
         public IEnumerable<ItemAmount> Ingredients { get { return _ingredients; } }
@@ -61,7 +62,7 @@ namespace FactorioCalculator.Models
 
         public override string ToString()
         {
-            return string.Format("SubModule<{0}>", Name);
+            return string.Format(CultureInfo.InvariantCulture, "SubModule<{0}>", Name);
         }
     }
 }

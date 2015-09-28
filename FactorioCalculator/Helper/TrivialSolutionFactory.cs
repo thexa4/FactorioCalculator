@@ -9,115 +9,81 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Helper
 {
-    static class TrivialSolutionFactory
+    class TrivialSolutionFactory
     {
-        public static List<IStep> Generate(Library library, Item item, double amount)
+        public static RecipeGraph CreateFactory(RecipeGraph recipe)
         {
-            
+            var inputs = new List<SourceStep>();
+            var outputs = new List<SinkStep>();
+            var wastes = new List<SinkStep>();
+            var resources = new List<FlowStep>();
+            var transforms = new List<TransformStep>();
 
-            return null;
-        }
-        /*
-        public static IEnumerable<IStep> GenerateProductionLayer(Library library, Item item, double amount)
-        {
-            List<IStep> result = new List<IStep>();
-            var chain = FindBestChain(library, item);
-            var top = new Step(null, new IStep[] { });
+            foreach (var resource in recipe.Resources)
+                resources.Add(new FlowStep(resource.Item) { Parent = resource });
 
-            Queue<Tuple<Item, RecipeGraph>> todo = new Queue<Tuple<Item, RecipeGraph>>();
-            Dictionary<Item, ItemAmount> balance = new Dictionary<Item, ItemAmount>();
-            Stack<Tuple<RecipeGraph, double>> nodes = new Stack<Tuple<RecipeGraph, double>>();
-            todo.Enqueue(new Tuple<Item, RecipeGraph>(item, chain));
-            foreach (var i in chain.RawIngredients)
-                if(!balance.ContainsKey(i))
-                    balance.Add(i, new ItemAmount(i, 0));
-            foreach (var i in chain.Waste)
-                if (!balance.ContainsKey(i))
-                    balance.Add(i, new ItemAmount(i, 0));
+            foreach(var input in recipe.InputNodes) {
+                var r = new FlowStep(input.Item) { Parent = input };
+                var s = new SourceStep(input.Item) { Parent = input };
 
-            foreach (var i in chain.Current.Results)
-                if (!balance.ContainsKey(i.Item))
-                    balance.Add(i.Item, new ItemAmount(i.Item, 0));
+                r.Previous.Add(s);
 
-            balance[item] -= amount;
-
-            while (todo.Count > 0)
-            {
-                var queueItem = todo.Dequeue();
-                var currentItem = queueItem.Item1;
-
-                var currentChain = queueItem.Item2;
-                var target = balance[currentItem];
-
-                if (target.Amount > 0)
-                    continue;
-
-                foreach (var input in currentChain.Current.Ingredients)
-                    if (currentChain.Ingredients.Count > 0)
-                    {
-                        var from = currentChain.Ingredients.Where((c) => c.Current.Results.Where((res) => res.Item == input.Item).Any()).Take(1).ToList();
-                        if(from.Count > 0)
-                            todo.Enqueue(new Tuple<Item, RecipeGraph>(input.Item, from[0]));
-                    }
-
-                var iterations = -target.Amount / currentChain.Current.Results.Where((r) => r.Item == currentItem).First().Amount;
-                foreach (var output in currentChain.Current.Results)
-                    balance[output.Item] += output * iterations;
-                foreach (var input in currentChain.Current.Ingredients)
-                    balance[input.Item] -= input * iterations;
-
-                nodes.Push(new Tuple<RecipeGraph, double>(currentChain, iterations));
+                resources.Add(r);
+                inputs.Add(s);
             }
 
-            List<ItemAmount> waste = new List<ItemAmount>();
-            List<ItemAmount> inputs = new List<ItemAmount>();
-
-            foreach (var key in balance.Keys)
+            foreach (var output in recipe.OutputNodes)
             {
-                if (balance[key].Amount == 0)
-                    continue;
-                if (balance[key].Amount > 0)
-                    waste.Add(balance[key]);
-                else
-                    inputs.Add(-balance[key]);
+                var r = new FlowStep(output.Item) { Parent = output };
+                var o = new SinkStep(output.Item) { Parent = output };
+
+                o.Previous.Add(r);
+
+                resources.Add(r);
+                outputs.Add(o);
             }
 
-            Dictionary<Item, List<IStep>> steps = new Dictionary<Item, List<IStep>>();
-
-            foreach (var input in inputs)
+            foreach (var waste in recipe.WasteNodes)
             {
-                var step = new SourceStep(top, new IStep[] { }, input);
-                steps.Add(input.Item, new List<IStep>() { step });
-                result.Add(step);
+                var w = new SinkStep(waste.Item) { Parent = waste };
+                wastes.Add(w);
+                w.Previous.Add(resources.Where((r) => r.Item.Item == waste.Item.Item).First());
             }
 
-            while (nodes.Count != 0)
+            foreach (var transform in recipe.Transformations)
             {
-                var node = nodes.Pop();
-                var nodeChain = node.Item1;
-                var nodeAmount = node.Item2;
-                var previous = nodeChain.Current.Ingredients.SelectMany((i) => steps[i.Item]);
-                var step = new TransformStep(top, previous, nodeChain.Current, nodeAmount);
-                foreach (var output in nodeChain.Current.Results)
+                var amount = transform.Amount;
+                var transformRecipe = transform.Recipe;
+                var building = FirstMatchingBuilding(transformRecipe.Buildings);
+                var modTime = building.MaxProductionFor(transformRecipe);
+                var nrOfFactories = Math.Ceiling(amount / modTime);
+
+                for (int i = 0; i < nrOfFactories; i++)
                 {
-                    if (!steps.ContainsKey(output.Item))
-                        steps.Add(output.Item, new List<IStep>());
-                    steps[output.Item].Add(step);
+                    var p = new ProductionStep(transform.Recipe, transform.Amount / nrOfFactories, building) { Parent = transform };
+                    foreach (var input in transformRecipe.Ingredients)
+                        p.Previous.Add(resources.Where((r) => r.Item.Item == input.Item).First());
+
+                    foreach (var output in transformRecipe.Results)
+                        resources.Where((r) => r.Item.Item == output.Item).First().Previous.Add(p);
+
+                    transforms.Add(p);
                 }
-                result.Add(step);
             }
 
-            foreach (var type in waste)
-                result.Add(new SinkStep(top, steps[type.Item], type));
-
-            result.Add(new SinkStep(top, steps[item], new ItemAmount(item, amount)));
-
-            return result;
+            return new RecipeGraph(wastes, inputs, outputs, resources, transforms);
         }
-        
-        public static RecipeGraph FindBestChain(Library library, Item item)
-        {
-            return library.RecipeChains[item].OrderBy((c) => c.Waste.Count()).First();
-        */
+
+        /// <summary>
+        /// Results lowest factory to build
+        /// </summary>
+        /// <param name="buildings"></param>
+        /// <returns></returns>
+        private static Building FirstMatchingBuilding(IEnumerable<Building> buildings) {
+            var filtered = buildings.Where((building) => building.Recipes.Any())
+                .Where((b) => b.Name != "player");
+            
+            return filtered.OrderBy(building => building.IngredientCount).First();
+        }
     }
 }

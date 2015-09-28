@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ using System.Xml.Serialization;
 namespace FactorioCalculator.Models
 {
     [Serializable]
-    class ItemAmount
+    public class ItemAmount
     {
         public double Amount { get; protected set; }
         public Item Item
@@ -59,14 +60,14 @@ namespace FactorioCalculator.Models
         public static ItemAmount operator +(ItemAmount item1, ItemAmount item2)
         {
             if (item1.Item != item2.Item)
-                throw new Exception("Items don't match");
+                throw new InvalidOperationException("Items don't match");
             return new ItemAmount(item1.Item, item1.Amount + item2.Amount);
         }
 
         public static ItemAmount operator -(ItemAmount item1, ItemAmount item2)
         {
             if (item1.Item != item2.Item)
-                throw new Exception("Items don't match");
+                throw new InvalidOperationException("Items don't match");
             return new ItemAmount(item1.Item, item1.Amount - item2.Amount);
         }
 
@@ -96,7 +97,7 @@ namespace FactorioCalculator.Models
 
         public override string ToString()
         {
-            return string.Format("ItemAmount<{0}, {1}>", Item, Amount);
+            return string.Format(CultureInfo.InvariantCulture, "ItemAmount<{0}, {1}>", Item, Amount);
         }
     }
 }
