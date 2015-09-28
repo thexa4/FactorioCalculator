@@ -20,7 +20,7 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public SolutionGrader Grader;
 
-        public SearchSpace Route(ItemAmount item, SearchSpace space, List<Vector2> startPositions, List<Vector2> destinations)
+        public SearchSpace Route(ItemAmount item, SearchSpace space, IEnumerable<RoutingCoord> startPositions, IEnumerable<RoutingCoord> destinations)
         {
             AStar<SolidRouteState> star = new AStar<SolidRouteState>();
             star.StateGenerator = (s) => s.NextStates(Grader.CostForBuilding, Belt, BeltGroundNormal, BeltGroundFast, BeltGroundExpress, Inserter, LongInserter, FastInserter);
@@ -31,28 +31,20 @@ namespace FactorioCalculator.Models.PlaceRoute
 
             foreach (var position in startPositions)
             {
-                if (position.X == 0 || position.Y == 0 || position.X == space.Size.X - 1 || position.Y == space.Size.Y - 1)
+                switch (position.Type)
                 {
-                    BuildingRotation r = BuildingRotation.North;
-                    if (position.X == 0)
-                        r = BuildingRotation.East;
-                    if (position.Y == 0)
-                        r = BuildingRotation.South;
-                    if (position.X == space.Size.X - 1)
-                        r = BuildingRotation.West;
-                    if (position.Y == space.Size.Y - 1)
-                        r = BuildingRotation.North;
-                    var startBuilding = new FlowBuilding(item, Belt, position, r);
-                    space = space.AddRoute(startBuilding);
-                    var startState = new SolidRouteState(startBuilding, 0, position, space, TransportState.Belt, Depth.None, r);
-                    star.AddState(startState);
-                }
-                else
-                {
-                    var startBuilding = new FlowBuilding(item, new Building("placed-item"), position, BuildingRotation.North);
-                    space = space.AddRoute(startBuilding);
-                    var startState = new SolidRouteState(startBuilding, 0, position, space, TransportState.PlacedItem);
-                    star.AddState(startState);
+                    case RoutingCoord.CoordType.Belt:
+                        var startBuilding = new FlowBuilding(item, Belt, position.Position, position.Rotation);
+                        space = space.AddRoute(startBuilding);
+                        var startState = new SolidRouteState(startBuilding, 0, position.Position, space, RoutingCoord.CoordType.Belt, Depth.None, position.Rotation);
+                        star.AddState(startState);
+                        break;
+                    case RoutingCoord.CoordType.PlacedItem:
+                        var startPlacedBuilding = new FlowBuilding(item, new Building("placed-item"), position.Position, BuildingRotation.North);
+                        space = space.AddRoute(startPlacedBuilding);
+                        var startPlacedState = new SolidRouteState(startPlacedBuilding, 0, position.Position, space, RoutingCoord.CoordType.PlacedItem);
+                        star.AddState(startPlacedState);
+                        break;
                 }
             }
 
@@ -61,22 +53,15 @@ namespace FactorioCalculator.Models.PlaceRoute
             return star.EndState.Space;
         }
 
-        private bool ValidateEndState(SolidRouteState state, HashSet<Vector2> destinations)
+        private bool ValidateEndState(SolidRouteState state, HashSet<RoutingCoord> destinations)
         {
-            if (!destinations.Contains(state.Position))
+            if (!destinations.Where((d) => d.Position == state.Position).Any())
                 return false;
 
-            if (state.Position.X <= 0 || state.Position.Y <= 0 | state.Position.X >= state.Space.Size.X - 1 || state.Position.Y >= state.Space.Size.Y - 1)
-            {
-                // Sink node
-                if (state.TransportState != TransportState.Belt)
-                    return false;
-            }
-            else
-            {
-                if (state.TransportState != TransportState.Inserter)
-                    return false;
-            }
+            var destination = destinations.Where((d) => d.Position == state.Position).First();
+
+            if (state.TransportState != destination.Type)
+                return false;
 
             return true;
         }

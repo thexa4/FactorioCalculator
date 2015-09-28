@@ -15,7 +15,7 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public SolutionGrader Grader;
         
-        public SearchSpace Route(ItemAmount item, SearchSpace space, Vector2 position, BuildingRotation rotation, List<Vector2> destinations)
+        public SearchSpace Route(ItemAmount item, SearchSpace space, Vector2 position, BuildingRotation rotation, List<RoutingCoord> destinations)
         {
             AStar<FluidRouteState> star = new AStar<FluidRouteState>();
             star.StateGenerator = (s) => s.NextStates(Grader.CostForBuilding, PipeToGround, Pipe);
@@ -33,7 +33,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             return star.EndState.Space;
         }
 
-        private bool ValidateEndState(FluidRouteState state, HashSet<Vector2> destinations)
+        private bool ValidateEndState(FluidRouteState state, HashSet<RoutingCoord> destinations)
         {
             if (state.Depth != Depth.None)
                 return false;
@@ -44,7 +44,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             bool found = false;
             BuildingRotation[] rotations = new BuildingRotation[] { BuildingRotation.North, BuildingRotation.East, BuildingRotation.South, BuildingRotation.West };
             foreach (var rotation in rotations)
-                if (destinations.Contains(state.Position + rotation.ToVector()))
+                if (destinations.Where((d) => d.Position == state.Position + rotation.ToVector()).Any())
                     found = true;
 
             if (!found)

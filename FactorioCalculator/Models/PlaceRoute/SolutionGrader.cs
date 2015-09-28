@@ -23,7 +23,7 @@ namespace FactorioCalculator.Models.PlaceRoute
         public double TouchLeakCost = 50;
         public double CollisionCost = 200;
         public double LandUseCost = 1;
-        public double EdgeUseCost = 200;
+        public double EdgeUseCost = 20;
         public double AreaCost = 1;
 
         public double CostForSolution(SearchSpace state)

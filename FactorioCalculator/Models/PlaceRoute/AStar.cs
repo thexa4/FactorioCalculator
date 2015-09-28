@@ -11,11 +11,11 @@ namespace FactorioCalculator.Models.PlaceRoute
     {
         public double DistanceCost { get; protected set; }
         protected HeapPriorityQueue<AStarState> _queue;
-        protected HashSet<Vector2> _destinations = new HashSet<Vector2>();
+        protected HashSet<RoutingCoord> _destinations = new HashSet<RoutingCoord>();
         public T EndState { get; private set; }
 
         public Func<T, IEnumerable<T>> StateGenerator { get; set; }
-        public Func<T, HashSet<Vector2>, bool> EndStateValidator { get; set; }
+        public Func<T, HashSet<RoutingCoord>, bool> EndStateValidator { get; set; }
 
         public AStar(double distanceCost = 5)
         {
@@ -23,14 +23,14 @@ namespace FactorioCalculator.Models.PlaceRoute
             _queue = new HeapPriorityQueue<AStarState>(100 * 1000);
         }
 
-        public void AddDestination(Vector2 position)
+        public void AddDestination(RoutingCoord position)
         {
             _destinations.Add(position);
         }
 
         public void AddState(T state)
         {
-            if (_destinations.Contains(state.Position))
+            if (_destinations.Contains(state.RoutingCoord))
             {
                 EndState = state;
                 return;
@@ -64,7 +64,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             double min = double.MaxValue / DistanceCost;
             foreach(var destination in _destinations)
             {
-                var offset = origin - destination;
+                var offset = origin - destination.Position;
                 var dist = Math.Abs(offset.X) + Math.Abs(offset.Y);
                 if (dist < min)
                     min = dist;

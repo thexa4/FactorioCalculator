@@ -125,6 +125,8 @@ namespace FactorioCalculator
             generator.SolidRouter = solid;
             generator.FluidRouter = router;
 
+            generator.Initialize();
+
             //space = router.Route(new ItemAmount(water, 1), space, new Vector2(2, 3), BuildingRotation.West, new List<Vector2>() { new Vector2(8, 12) });
             //space = router.Route(new ItemAmount(oil, 1), space, new Vector2(4, 3), BuildingRotation.East, new List<Vector2>() { new Vector2(7, 13) });
             //List<Vector2> startPoints = new List<Vector2>();
@@ -143,6 +145,7 @@ namespace FactorioCalculator
             space = solid.Route(new ItemAmount(coal, 0.1), space, startPoints, destinations);
             space = solid.Route(new ItemAmount(ironPlate, 0.1), space, destinations, new List<Vector2>() { new Vector2(9, 6) });
             */
+            
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 

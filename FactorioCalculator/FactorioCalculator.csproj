@@ -144,10 +144,12 @@
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\ItemType.cs" />
     <Compile Include="Models\Library.cs" />
+    <Compile Include="Models\PlaceRoute\RoutingCoord.cs" />
     <Compile Include="Models\PlaceRoute\SolidRouter.cs" />
     <Compile Include="Models\PlaceRoute\SolidRouteState.cs" />
     <Compile Include="Models\PlaceRoute\SolutionGenerator.cs" />
     <Compile Include="Models\PlaceRoute\SolutionGrader.cs" />
+    <Compile Include="Models\PlaceRoute\SolutionParameters.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\ItemAmount.cs" />
     <Compile Include="Models\Factory\RecipeGraph.cs" />

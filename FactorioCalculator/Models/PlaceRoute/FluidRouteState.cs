@@ -36,6 +36,8 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public FlowBuilding FlowBuilding { get { return _building as FlowBuilding; } }
 
+        public RoutingCoord RoutingCoord { get { return new RoutingCoord(_position, PlaceRoute.RoutingCoord.CoordType.Pipe, BuildingRotation.North); } }
+
         public FluidRouteState(IPhysicalBuilding building, double cost, Vector2 position, SearchSpace space, Depth depth = Depth.None, BuildingRotation direction = BuildingRotation.North, bool hasJustSurfaced = false, int undergroundLength = 0)
         {
             _building = building;

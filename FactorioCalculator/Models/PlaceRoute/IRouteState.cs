@@ -13,5 +13,6 @@ namespace FactorioCalculator.Models.PlaceRoute
         Vector2 Position { get; }
         IPhysicalBuilding Building { get; }
         SearchSpace Space { get; }
+        RoutingCoord RoutingCoord { get; }
     }
 }
