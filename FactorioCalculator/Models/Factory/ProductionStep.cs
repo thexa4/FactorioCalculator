@@ -16,6 +16,11 @@ namespace FactorioCalculator.Models.Factory
         public ProductionStep(Recipe recipe, double amount, Building building)
             : base(recipe, amount)
         {
+            if (recipe == null)
+                throw new ArgumentNullException("recipe");
+            if (building == null)
+                throw new ArgumentNullException("building");
+
             Building = building;
 
             if (MaxAmount == 0)

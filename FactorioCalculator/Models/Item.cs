@@ -13,7 +13,6 @@ namespace FactorioCalculator.Models
     {
         public string Name { get; set; }
         public double FuelValue { get; set; }
-        public string SubGroup { get; set; }
         public string PlaceResultName { get; set; }
 
         public bool IsResource { get; set; }

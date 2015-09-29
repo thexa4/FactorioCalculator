@@ -11,19 +11,19 @@ namespace FactorioCalculator.Models.PlaceRoute
     {
         public double DistanceCost { get; protected set; }
         protected HeapPriorityQueue<AStarState> _queue;
-        protected HashSet<RoutingCoord> _destinations = new HashSet<RoutingCoord>();
+        protected HashSet<RoutingCoordinate> _destinations = new HashSet<RoutingCoordinate>();
         public T EndState { get; private set; }
 
         public Func<T, IEnumerable<T>> StateGenerator { get; set; }
-        public Func<T, HashSet<RoutingCoord>, bool> EndStateValidator { get; set; }
+        public Func<T, HashSet<RoutingCoordinate>, bool> EndStateValidator { get; set; }
 
         public AStar(double distanceCost = 5)
         {
             DistanceCost = distanceCost;
-            _queue = new HeapPriorityQueue<AStarState>(100 * 1000);
+            _queue = new HeapPriorityQueue<AStarState>(300 * 1000);
         }
 
-        public void AddDestination(RoutingCoord position)
+        public void AddDestination(RoutingCoordinate position)
         {
             _destinations.Add(position);
         }

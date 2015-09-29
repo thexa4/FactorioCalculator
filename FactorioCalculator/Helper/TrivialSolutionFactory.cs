@@ -9,10 +9,13 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Helper
 {
-    class TrivialSolutionFactory
+    public static class TrivialSolutionFactory
     {
         public static RecipeGraph CreateFactory(RecipeGraph recipe)
         {
+            if (recipe == null)
+                throw new ArgumentNullException("recipe");
+
             var inputs = new List<SourceStep>();
             var outputs = new List<SinkStep>();
             var wastes = new List<SinkStep>();

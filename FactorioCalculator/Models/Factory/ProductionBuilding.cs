@@ -18,8 +18,8 @@ namespace FactorioCalculator.Models.Factory
             get
             {
                 IEnumerable<FluidBox> result = new FluidBox[]{};
-                var inputs = Building.Fluidboxes.Where((b) => b.IsOutput == false);
-                var outputs = Building.Fluidboxes.Where((b) => b.IsOutput == true);
+                var inputs = Building.FluidBoxes.Where((b) => b.IsOutput == false);
+                var outputs = Building.FluidBoxes.Where((b) => b.IsOutput == true);
                 if (!Building.HidesFluidBox || Recipe.Ingredients.Where((i) => i.Item.ItemType == ItemType.Fluid).Any())
                     result = result.Concat(inputs);
                 if (!Building.HidesFluidBox || Recipe.Results.Where((i) => i.Item.ItemType == ItemType.Fluid).Any())
@@ -31,6 +31,11 @@ namespace FactorioCalculator.Models.Factory
         public ProductionBuilding(Recipe recipe, double amount, Building building, Vector2 position, BuildingRotation rotation)
             : base(recipe, amount, building)
         {
+            if (recipe == null)
+                throw new ArgumentNullException("recipe");
+            if (building == null)
+                throw new ArgumentNullException("building");
+
             Position = position;
             Size = building.Size.RotateAbsolute(rotation);
             Rotation = rotation;

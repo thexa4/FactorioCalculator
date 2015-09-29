@@ -15,7 +15,7 @@ namespace FactorioCalculator.Helper
         /// <param name="inputs">The inputs to sort</param>
         /// <param name="linksTo">A predicate wether element 1 links to element 2</param>
         /// <returns>A topologically sorted representation</returns>
-        public static IEnumerable<T> SortTopological<T>(this IEnumerable<T> inputs, Func<T, T, bool> linksTo, bool allowCycles = false)
+        public static IEnumerable<T> SortTopological<T>(this IEnumerable<T> inputs, Func<T, T, bool> linksTo, bool allowCycles)
         {
             Dictionary<T, int> links = new Dictionary<T,int>();
             Dictionary<Tuple<T, T>, bool> linkCache = new Dictionary<Tuple<T, T>, bool>();

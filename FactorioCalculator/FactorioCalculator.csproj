@@ -135,7 +135,7 @@
     <Compile Include="Models\PlaceRoute\FluidRouter.cs" />
     <Compile Include="Models\PlaceRoute\IRouteState.cs" />
     <Compile Include="Models\PlaceRoute\FluidRouteState.cs" />
-    <Compile Include="Models\PlaceRoute\SearchSpace.cs" />
+    <Compile Include="Models\PlaceRoute\Searchspace.cs" />
     <Compile Include="Models\Factory\SinkStep.cs" />
     <Compile Include="Models\Factory\SourceStep.cs" />
     <Compile Include="Models\Factory\TransformStep.cs" />
@@ -144,7 +144,7 @@
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\ItemType.cs" />
     <Compile Include="Models\Library.cs" />
-    <Compile Include="Models\PlaceRoute\RoutingCoord.cs" />
+    <Compile Include="Models\PlaceRoute\RoutingCoordinate.cs" />
     <Compile Include="Models\PlaceRoute\SolidRouter.cs" />
     <Compile Include="Models\PlaceRoute\SolidRouteState.cs" />
     <Compile Include="Models\PlaceRoute\SolutionGenerator.cs" />

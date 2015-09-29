@@ -19,7 +19,7 @@ namespace FactorioCalculator.Models.Factory
         /// <summary>
         /// The step(s) that precede this one
         /// </summary>
-        public HashSet<IStep> Previous { get; set; }
+        public HashSet<IStep> Previous { get; private set; }
 
         public IEnumerable<Item> Waste { get { return _waste.Select((s) => s.Item.Item);  } }
         public IEnumerable<SinkStep> WasteNodes { get { return _waste; } }
@@ -56,6 +56,15 @@ namespace FactorioCalculator.Models.Factory
         
         public static RecipeGraph FromLibrary(Library library, IEnumerable<Item> inputs, IEnumerable<ItemAmount> outputs, Func<Item, double> costFunction)
         {
+            if (library == null)
+                throw new ArgumentNullException("library");
+            if (inputs == null)
+                throw new ArgumentNullException("inputs");
+            if (outputs == null)
+                throw new ArgumentNullException("outputs");
+            if (costFunction == null)
+                throw new ArgumentNullException("costFunction");
+
             var solver = new SimplexSolver();
             var itemRows = new Dictionary<Item, int>();
             var recipeVars = new Dictionary<Recipe, int>();
@@ -159,7 +168,6 @@ namespace FactorioCalculator.Models.Factory
             foreach (var recipe in sortedRecipes)
             {
                 var previous = recipe.Item1.Ingredients.Select((i) => i.Item);
-                var next = recipe.Item1.Results.Select((i) => i.Item);
                 var step = new TransformStep(recipe.Item1, recipe.Item2);
                 foreach (var item in previous)
                 {

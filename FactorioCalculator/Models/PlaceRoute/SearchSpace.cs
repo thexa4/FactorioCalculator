@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.PlaceRoute
 {
-    public struct SearchSpace
+    public struct Searchspace
     {
         public ImmutableList<CollisionBox<ProductionBuilding>> Components { get { return _components; } }
         public ImmutableList<CollisionBox<FlowBuilding>> Routes { get { return _routes; } }
@@ -22,32 +22,32 @@ namespace FactorioCalculator.Models.PlaceRoute
         public Vector2 Size { get { return _size; } }
         private Vector2 _size;
 
-        public SearchSpace(Vector2 size) : this(size, ImmutableList<CollisionBox<ProductionBuilding>>.Empty, ImmutableList<CollisionBox<FlowBuilding>>.Empty) { }
+        public Searchspace(Vector2 size) : this(size, ImmutableList<CollisionBox<ProductionBuilding>>.Empty, ImmutableList<CollisionBox<FlowBuilding>>.Empty) { }
 
-        public SearchSpace(Vector2 size, ImmutableList<CollisionBox<ProductionBuilding>> components, ImmutableList<CollisionBox<FlowBuilding>> routes)
+        public Searchspace(Vector2 size, ImmutableList<CollisionBox<ProductionBuilding>> components, ImmutableList<CollisionBox<FlowBuilding>> routes)
         {
             _size = size;
             _components = components;
             _routes = routes;
         }
 
-        public SearchSpace AddComponent(ProductionBuilding building)
+        public Searchspace AddComponent(ProductionBuilding building)
         {
-            return new SearchSpace(Size, _components.Add(new CollisionBox<ProductionBuilding>(building)), _routes);
+            return new Searchspace(Size, _components.Add(new CollisionBox<ProductionBuilding>(building)), _routes);
         }
 
-        public SearchSpace AddRoute(FlowBuilding building)
+        public Searchspace AddRoute(FlowBuilding building)
         {
-            return new SearchSpace(Size, _components, _routes.Add(new CollisionBox<FlowBuilding>(building)));
+            return new Searchspace(Size, _components, _routes.Add(new CollisionBox<FlowBuilding>(building)));
         }
 
-        public IEnumerable<IPhysicalBuilding> CalculateCollisions(Vector2 pos)
+        public IEnumerable<IPhysicalBuilding> CalculateCollisions(Vector2 position)
         {
-            return CalculateCollisions(pos, Vector2.One);
+            return CalculateCollisions(position, Vector2.One);
         }
 
-        public IEnumerable<IPhysicalBuilding> CalculateCollisions(Vector2 pos, Vector2 size) {
-            RectangleF source = new RectangleF((float)pos.X, (float)pos.Y, (float)size.X, (float)size.Y);
+        public IEnumerable<IPhysicalBuilding> CalculateCollisions(Vector2 position, Vector2 size) {
+            RectangleF source = new RectangleF((float)position.X, (float)position.Y, (float)size.X, (float)size.Y);
             foreach (var building in Buildings)
             {
                 RectangleF test = new RectangleF((float)building.Position.X, (float)building.Position.Y,
@@ -58,10 +58,54 @@ namespace FactorioCalculator.Models.PlaceRoute
             }
         }
 
-        public bool IsValidSinkSourcePosition(Vector2 pos)
+        public bool IsValidSinkSourcePosition(Vector2 position)
         {
-            Vector2 offset = pos - Vector2.One - _size;
-            return offset.X == 0 || offset.Y == 0 || pos.X == 0 | pos.Y == 0;
+            Vector2 offset = position - Vector2.One - _size;
+            return offset.X == 0 || offset.Y == 0 || position.X == 0 | position.Y == 0;
+        }
+
+
+        public override int GetHashCode()
+        {
+            int result = _size.GetHashCode();
+            foreach (var building in Buildings)
+                result ^= building.GetHashCode();
+
+            return result;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Searchspace))
+                return false;
+
+            return Equals((Searchspace)obj);
+        }
+
+        public bool Equals(Searchspace other)
+        {
+            if (other._size != _size)
+                return false;
+
+            var otherBuildings = other.Buildings.OrderBy((b) => b.GetHashCode());
+
+            return otherBuildings.SequenceEqual(Buildings.OrderBy((b) => b.GetHashCode()));
+        }
+
+        public static bool operator ==(Searchspace space1, Searchspace space2)
+        {
+            if (space1 == null)
+                return space2 == null;
+
+            return space1.Equals(space2);
+        }
+
+        public static bool operator !=(Searchspace space1, Searchspace space2)
+        {
+            if (space1 == null)
+                return space2 != null;
+
+            return !space1.Equals(space2);
         }
     }
 }

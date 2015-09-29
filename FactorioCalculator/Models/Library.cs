@@ -43,7 +43,7 @@ namespace FactorioCalculator.Models
             AddItem(warmWater);
 
             Building boiler = _buildings.Where((b) => b.Name == "boiler").First();
-            boiler.CraftingCategories.Add("boiling");
+            boiler.AddCraftingCategory("boiling");
             
             double boilerPower = 390 * 1000;
             double boilerEffectivity = 0.5;
@@ -72,7 +72,7 @@ namespace FactorioCalculator.Models
             }
 
             Building steamEngine = _buildings.Where((b) => b.Name == "steam-engine").First();
-            steamEngine.CraftingCategories.Add("generator");
+            steamEngine.AddCraftingCategory("generator");
             steamEngine.ProductionSpeed = 1;
             steamEngine.IngredientCount = 1;
 
@@ -100,6 +100,9 @@ namespace FactorioCalculator.Models
 
         public void AddItem(Item item)
         {
+            if (item == null)
+                throw new ArgumentNullException("item");
+
             item.Initialize(this);
             _items.Add(item);
         }
@@ -111,6 +114,9 @@ namespace FactorioCalculator.Models
 
         public void AddBuilding(Building building)
         {
+            if (building == null)
+                throw new ArgumentNullException("building");
+
             building.Initialize(this);
             _buildings.Add(building);
         }
@@ -122,6 +128,9 @@ namespace FactorioCalculator.Models
 
         public void AddRecipe(Recipe process)
         {
+            if (process == null)
+                throw new ArgumentNullException("process");
+
             process.Initialize(this);
             _recipes.Add(process);
         }

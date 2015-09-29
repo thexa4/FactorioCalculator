@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FactorioCalculator.Helper;
+using System.Globalization;
 
 namespace FactorioCalculator.Models.Factory
 {
@@ -18,6 +19,10 @@ namespace FactorioCalculator.Models.Factory
         public FlowBuilding(ItemAmount item, Building building, Vector2 position, BuildingRotation rotation)
             : base(item)
         {
+            if (item == null)
+                throw new ArgumentNullException("item");
+            if (building == null)
+                throw new ArgumentNullException("building");
             Item = item;
             Building = building;
             Position = position;
@@ -27,7 +32,7 @@ namespace FactorioCalculator.Models.Factory
 
         public override string ToString()
         {
-            return string.Format("{0}<{1}>", Building.Name, Item);
+            return string.Format(CultureInfo.InvariantCulture, "{0}<{1}>", Building.Name, Item);
         }
     }
 }

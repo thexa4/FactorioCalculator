@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{29F6A8
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalculatorTest", "CalculatorTest\CalculatorTest.csproj", "{E211CC6A-5A16-4ADA-815B-D9F54D4F79F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,14 @@ Global
 		{F55CABBB-4108-4A39-94E1-581FD46DC021}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F55CABBB-4108-4A39-94E1-581FD46DC021}.Release|x64.ActiveCfg = Release|Any CPU
 		{F55CABBB-4108-4A39-94E1-581FD46DC021}.Release|x86.ActiveCfg = Release|Any CPU
+		{E211CC6A-5A16-4ADA-815B-D9F54D4F79F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E211CC6A-5A16-4ADA-815B-D9F54D4F79F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E211CC6A-5A16-4ADA-815B-D9F54D4F79F3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E211CC6A-5A16-4ADA-815B-D9F54D4F79F3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E211CC6A-5A16-4ADA-815B-D9F54D4F79F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E211CC6A-5A16-4ADA-815B-D9F54D4F79F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E211CC6A-5A16-4ADA-815B-D9F54D4F79F3}.Release|x64.ActiveCfg = Release|Any CPU
+		{E211CC6A-5A16-4ADA-815B-D9F54D4F79F3}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

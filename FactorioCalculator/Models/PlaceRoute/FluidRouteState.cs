@@ -16,8 +16,8 @@ namespace FactorioCalculator.Models.PlaceRoute
         public Vector2 Position { get { return _position; } }
         private Vector2 _position;
 
-        public SearchSpace Space { get { return _space; } }
-        private SearchSpace _space;
+        public Searchspace Space { get { return _space; } }
+        private Searchspace _space;
 
         public Depth Depth { get { return _depth; } }
         private Depth _depth;
@@ -36,9 +36,9 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public FlowBuilding FlowBuilding { get { return _building as FlowBuilding; } }
 
-        public RoutingCoord RoutingCoord { get { return new RoutingCoord(_position, PlaceRoute.RoutingCoord.CoordType.Pipe, BuildingRotation.North); } }
+        public RoutingCoordinate RoutingCoord { get { return new RoutingCoordinate(_position, PlaceRoute.RoutingCoordinate.CoordinateType.Pipe, BuildingRotation.North); } }
 
-        public FluidRouteState(IPhysicalBuilding building, double cost, Vector2 position, SearchSpace space, Depth depth = Depth.None, BuildingRotation direction = BuildingRotation.North, bool hasJustSurfaced = false, int undergroundLength = 0)
+        public FluidRouteState(IPhysicalBuilding building, double cost, Vector2 position, Searchspace space, Depth depth = Depth.None, BuildingRotation direction = BuildingRotation.North, bool hasJustSurfaced = false, int undergroundLength = 0)
         {
             _building = building;
             _cost = cost;
@@ -50,7 +50,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             _undergroundLength = undergroundLength;
         }
 
-        public IEnumerable<FluidRouteState> NextStates(Func<SearchSpace, IPhysicalBuilding, double> costFunction, Building pipeToGround, Building pipe)
+        public IEnumerable<FluidRouteState> NextStates(Func<Searchspace, IPhysicalBuilding, double> costFunction, Building pipeToGround, Building pipe)
         {
             if (_depth == Depth.Fluid)
             {

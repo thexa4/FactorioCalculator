@@ -13,13 +13,10 @@ namespace FactorioCalculator.Models.PlaceRoute
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public ImmutableList<SourceStep> Sources { get; private set; }
         public ImmutableDictionary<SourceStep, Vector2> SourcePositions { get; private set; }
 
-        public ImmutableList<SinkStep> Sinks { get; private set; }
         public ImmutableDictionary<SinkStep, Vector2> SinkPositions { get; private set; }
 
-        public ImmutableList<ProductionStep> Buildings { get; private set; }
         public ImmutableDictionary<ProductionStep, Tuple<Vector2, BuildingRotation>> BuildingPositions { get; private set; }
 
         public ImmutableList<Tuple<IStep, Item, bool>> Connections { get; private set; }
@@ -34,32 +31,44 @@ namespace FactorioCalculator.Models.PlaceRoute
             Width = width;
             Height = height;
 
-            Sources = ImmutableList<SourceStep>.Empty;
             SourcePositions = ImmutableDictionary<SourceStep, Vector2>.Empty;
-            Sinks = ImmutableList<SinkStep>.Empty;
             SinkPositions = ImmutableDictionary<SinkStep, Vector2>.Empty;
-            Buildings = ImmutableList<ProductionStep>.Empty;
             BuildingPositions = ImmutableDictionary<ProductionStep, Tuple<Vector2, BuildingRotation>>.Empty;
             Connections = ImmutableList<Tuple<IStep, Item, bool>>.Empty;
         }
 
+        public SolutionParameters(int width, int height,
+            ImmutableDictionary<SourceStep, Vector2> sourcePositions,
+            ImmutableDictionary<SinkStep, Vector2> sinkPositions, 
+            ImmutableDictionary<ProductionStep, Tuple<Vector2, BuildingRotation>> buildingPositions,
+            ImmutableList<Tuple<IStep, Item, bool>> connections)
+        {
+            Width = width;
+            Height = height;
+            SourcePositions = sourcePositions;
+            SinkPositions = sinkPositions;
+            BuildingPositions = buildingPositions;
+            Connections = connections;
+        }
+
         public static SolutionParameters FromFactory(int width, int height, RecipeGraph factory)
         {
+            if (factory == null)
+                throw new ArgumentNullException("factory");
+
             var result = new SolutionParameters(width, height);
 
-            result.Sinks = factory.OutputNodes.Concat(factory.WasteNodes).ToImmutableList();
-            result.SinkPositions = result.Sinks.Select((s) => new KeyValuePair<SinkStep, Vector2>(s, Vector2.Zero)).ToImmutableDictionary();
+            result.SinkPositions = factory.OutputNodes.Concat(factory.WasteNodes).Select((s) => new KeyValuePair<SinkStep, Vector2>(s, Vector2.Zero)).ToImmutableDictionary();
 
-            result.Sources = factory.InputNodes.ToImmutableList();
-            result.SourcePositions = result.Sources.Select((s) => new KeyValuePair<SourceStep, Vector2>(s, Vector2.Zero)).ToImmutableDictionary();
+            result.SourcePositions = factory.InputNodes.Select((s) => new KeyValuePair<SourceStep, Vector2>(s, Vector2.Zero)).ToImmutableDictionary();
 
-            result.Buildings = factory.Transformations.Cast<ProductionStep>().ToImmutableList();
-            result.BuildingPositions = result.Buildings.Select((b) => new KeyValuePair<ProductionStep, Tuple<Vector2, BuildingRotation>>(b, new Tuple<Vector2, BuildingRotation>(Vector2.Zero, BuildingRotation.North))).ToImmutableDictionary();
+            var buildings = factory.Transformations.Cast<ProductionStep>().ToImmutableList();
+            result.BuildingPositions = buildings.Select((b) => new KeyValuePair<ProductionStep, Tuple<Vector2, BuildingRotation>>(b, new Tuple<Vector2, BuildingRotation>(Vector2.Zero, BuildingRotation.North))).ToImmutableDictionary();
 
-            var buildingInputs = result.Buildings.SelectMany((b) => b.Recipe.Ingredients.Select((i) => new Tuple<IStep, Item, bool>(b, i.Item, true)));
-            var buildingOutputs = result.Buildings.SelectMany((b) => b.Recipe.Results.Select((i) => new Tuple<IStep, Item, bool>(b, i.Item, false)));
-            var sinkInputs = result.Sinks.Select((s) => new Tuple<IStep, Item, bool>(s, s.Item.Item, true));
-            var sourceOutputs = result.Sources.Select((s) => new Tuple<IStep, Item, bool>(s, s.Item.Item, false));
+            var buildingInputs = buildings.SelectMany((b) => b.Recipe.Ingredients.Select((i) => new Tuple<IStep, Item, bool>(b, i.Item, true)));
+            var buildingOutputs = buildings.SelectMany((b) => b.Recipe.Results.Select((i) => new Tuple<IStep, Item, bool>(b, i.Item, false)));
+            var sinkInputs = result.SinkPositions.Keys.Select((s) => new Tuple<IStep, Item, bool>(s, s.Item.Item, true));
+            var sourceOutputs = result.SourcePositions.Keys.Select((s) => new Tuple<IStep, Item, bool>(s, s.Item.Item, false));
 
             result.Connections = buildingInputs.Concat(buildingOutputs).Concat(sinkInputs).Concat(sourceOutputs).ToImmutableList();
 
@@ -91,7 +100,7 @@ namespace FactorioCalculator.Models.PlaceRoute
         {
             var maxOffset = Math.Max(Width, Height);
 
-            foreach (var building in Buildings)
+            foreach (var building in BuildingPositions.Keys)
             {
                 var xOffset = Math.Floor((2 * _random.NextDouble() - 1) * maxOffset * temperature);
                 var yOffset = Math.Floor((2 * _random.NextDouble() - 1) * maxOffset * temperature);
@@ -106,20 +115,20 @@ namespace FactorioCalculator.Models.PlaceRoute
         {
             var maxOffset = 2 * (Width + Height) - 4;
 
-            foreach (var sink in Sinks)
+            foreach (var sink in SinkPositions.Keys)
             {
-                var newPos = IntToBound(BoundToInt(SinkPositions[sink]) + (int)((2 * _random.NextDouble() - 1) * maxOffset * temperature * 16));
+                var newPos = IndexToBound(BoundToIndex(SinkPositions[sink]) + (int)((2 * _random.NextDouble() - 1) * maxOffset * temperature * 16));
                 SinkPositions = SinkPositions.SetItem(sink, newPos);
             }
 
-            foreach (var source in Sources)
+            foreach (var source in SourcePositions.Keys)
             {
-                var newPos = IntToBound(BoundToInt(SourcePositions[source]) + (int)((2 * _random.NextDouble() - 1) * maxOffset * temperature * 16));
+                var newPos = IndexToBound(BoundToIndex(SourcePositions[source]) + (int)((2 * _random.NextDouble() - 1) * maxOffset * temperature * 16));
                 SourcePositions = SourcePositions.SetItem(source, newPos);
             }
         }
 
-        private Vector2 Clamp(Vector2 input, Vector2 bound)
+        public static Vector2 Clamp(Vector2 input, Vector2 bound)
         {
             var x = input.X;
             var y = input.Y;
@@ -137,44 +146,47 @@ namespace FactorioCalculator.Models.PlaceRoute
             return new Vector2(x, y);
         }
 
-        private Vector2 Reflect(Vector2 input, Vector2 bound)
+        public static Vector2 Reflect(Vector2 input, Vector2 bound)
         {
             var clipped = Clamp(input, bound);
             var diff = input - clipped;
             return Clamp(clipped - diff, bound);
         }
 
-        private int BoundToInt(Vector2 pos)
+        private static double Nfmod(double a, double b)
         {
-            if (pos.Y == 0)
-                return (int)pos.X;
-            if (pos.X == Width - 1)
-                return (int)pos.Y + (int)Width - 1;
-            if (pos.Y == Height - 1)
-                return (int)Width - (int)pos.X - 3 + (int)Width + (int)Height;
-            return (int)Height - (int)pos.Y + 2 * (int)Width + (int)Height - 4;
+            return a - b * Math.Floor(a / b);
         }
 
-        private Vector2 IntToBound(int pos)
+        public int BoundToIndex(Vector2 position)
+        {
+            if (position.Y == 0)
+                return (int)position.X;
+            if (position.X == Width - 1)
+                return (int)position.Y + (int)Width - 1;
+            if (position.Y == Height - 1)
+                return (int)Width - (int)position.X - 3 + (int)Width + (int)Height;
+            return (int)Height - (int)position.Y + 2 * (int)Width + (int)Height - 4;
+        }
+
+        public Vector2 IndexToBound(int index)
         {
             int length = 2 * (Width + Height) - 4;
-            if (pos < 0)
-                pos += length;
-            pos = pos % length;
+            index = (int)Nfmod(index, length);
 
-            if (pos <= Width)
-                return new Vector2(pos, 0);
-            pos -= Width - 1;
+            if (index <= Width - 1)
+                return new Vector2(index, 0);
+            index -= Width - 1;
 
-            if (pos <= Height)
-                return new Vector2(Width - 1, pos);
-            pos -= Height - 1;
+            if (index <= Height - 1)
+                return new Vector2(Width - 1, index);
+            index -= Height - 1;
 
-            if (pos <= Width)
-                return new Vector2(Width - pos - 1, Height - 1);
-            pos -= Width - 1;
+            if (index <= Width - 1)
+                return new Vector2(Width - index - 1, Height - 1);
+            index -= Width - 1;
 
-            return new Vector2(0, Height - pos - 1);
+            return new Vector2(0, Height - index - 1);
         }
 
         private void ModifyConnections(double temperature)
@@ -192,6 +204,36 @@ namespace FactorioCalculator.Models.PlaceRoute
                 Connections = Connections.SetItem(to, Connections[from]);
                 Connections = Connections.SetItem(from, temp);
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as SolutionParameters;
+            if (other != null)
+            {
+                return other.Width == Width &&
+                    other.Height == Height &&
+                    SourcePositions.SequenceEqual(other.SourcePositions) &&
+                    SinkPositions.SequenceEqual(other.SinkPositions) &&
+                    BuildingPositions.SequenceEqual(other.BuildingPositions) &&
+                    Connections.SequenceEqual(other.Connections);
+            }
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            int result = new Tuple<int, int>(Width, Height).GetHashCode();
+            foreach (var item in SourcePositions)
+                result ^= item.GetHashCode();
+            foreach (var item in SinkPositions)
+                result ^= item.GetHashCode();
+            foreach (var item in BuildingPositions)
+                result ^= item.GetHashCode();
+            foreach (var item in Connections)
+                result ^= item.GetHashCode();
+
+            return result;
         }
     }
 }

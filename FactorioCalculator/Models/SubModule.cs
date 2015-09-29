@@ -20,7 +20,7 @@ namespace FactorioCalculator.Models
         public double Time { get; set; }
 
         [XmlIgnore]
-        protected Library _library;
+        protected Library Library { get; set; }
 
         public SubModule(string name)
         {
@@ -29,7 +29,7 @@ namespace FactorioCalculator.Models
 
         public void Initialize(Library library)
         {
-            _library = library;
+            Library = library;
 
             foreach (var i in _ingredients)
                 i.Initialize(library);
@@ -40,23 +40,35 @@ namespace FactorioCalculator.Models
 
         public void AddIngredient(ItemAmount amount)
         {
-            amount.Initialize(_library);
+            if (amount == null)
+                throw new ArgumentNullException("amount");
+
+            amount.Initialize(Library);
             _ingredients.Add(amount);
         }
 
         public void RemoveIngredient(ItemAmount amount)
         {
+            if (amount == null)
+                throw new ArgumentNullException("amount");
+
             _ingredients.Remove(amount);
         }
 
         public void AddResult(ItemAmount amount)
         {
-            amount.Initialize(_library);
+            if (amount == null)
+                throw new ArgumentNullException("amount");
+
+            amount.Initialize(Library);
             _results.Add(amount);
         }
 
         public void RemoveResult(ItemAmount amount)
         {
+            if (amount == null)
+                throw new ArgumentNullException("amount");
+
             _results.Remove(amount);
         }
 

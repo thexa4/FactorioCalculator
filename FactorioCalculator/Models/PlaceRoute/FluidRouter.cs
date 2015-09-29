@@ -10,13 +10,32 @@ namespace FactorioCalculator.Models.PlaceRoute
 {
     public class FluidRouter
     {
-        public Building PipeToGround;
-        public Building Pipe;
+        public Building PipeToGround { get; protected set; }
+        public Building Pipe { get; protected set; }
 
-        public SolutionGrader Grader;
-        
-        public SearchSpace Route(ItemAmount item, SearchSpace space, Vector2 position, BuildingRotation rotation, List<RoutingCoord> destinations)
+        public SolutionGrader Grader  { get; protected set; }
+
+        public FluidRouter(Building pipeToGround, Building pipe, SolutionGrader grader)
         {
+            if (pipeToGround == null)
+                throw new ArgumentNullException("pipeToGround");
+            if (pipe == null)
+                throw new ArgumentNullException("pipe");
+            if (grader == null)
+                throw new ArgumentNullException("grader");
+
+            PipeToGround = pipeToGround;
+            Pipe = pipe;
+            Grader = grader;
+        }
+
+        public Searchspace Route(ItemAmount item, Searchspace space, Vector2 position, BuildingRotation rotation, IEnumerable<RoutingCoordinate> destinations)
+        {
+            if (item == null)
+                throw new ArgumentNullException("item");
+            if (destinations == null)
+                throw new ArgumentNullException("destinations");
+
             AStar<FluidRouteState> star = new AStar<FluidRouteState>();
             star.StateGenerator = (s) => s.NextStates(Grader.CostForBuilding, PipeToGround, Pipe);
             star.EndStateValidator = ValidateEndState;
@@ -33,7 +52,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             return star.EndState.Space;
         }
 
-        private bool ValidateEndState(FluidRouteState state, HashSet<RoutingCoord> destinations)
+        private bool ValidateEndState(FluidRouteState state, HashSet<RoutingCoordinate> destinations)
         {
             if (state.Depth != Depth.None)
                 return false;

@@ -20,7 +20,7 @@ namespace FactorioCalculator.Models.Factory
         /// <summary>
         /// The step(s) that precede this one
         /// </summary>
-        public HashSet<IStep> Previous { get; set; }
+        public HashSet<IStep> Previous { get; private set; }
 
         public Step()
         {

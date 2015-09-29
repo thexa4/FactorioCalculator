@@ -11,6 +11,6 @@ namespace FactorioCalculator.Models
         None = 0,
         Solid = 1,
         Fluid = 2,
-        Electricicy = 3,
+        Electricity = 3,
     }
 }

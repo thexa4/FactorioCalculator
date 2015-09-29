@@ -12,12 +12,13 @@ using System.Windows.Forms;
 
 namespace FactorioCalculator
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode")]
     static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        [STAThread]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1505:AvoidUnmaintainableCode"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase"), STAThread]
         static void Main()
         {
             ModImporter a = new ModImporter(@"C:\Program Files\Factorio", "base");
@@ -95,7 +96,7 @@ namespace FactorioCalculator
             var pipe = a.Library.Buildings.Where((b) => b.Name == "pipe").First();
             var pipeToGround = a.Library.Buildings.Where((b) => b.Name == "pipe-to-ground").First();
 
-            var space = new SearchSpace(new Vector2(10, 10));
+            var space = new Searchspace(new Vector2(10, 10));
             //var refBuilding = new ProductionBuilding(refinery.Recipes.First(), 0.1, refinery, Vector2.One, BuildingRotation.East);
             //var chemBuilding = new ProductionBuilding(chemical.Recipes.First(), 0.1, chemical, new Vector2(6, 11), BuildingRotation.North);
             //space = space.AddComponent(refBuilding);
@@ -106,20 +107,17 @@ namespace FactorioCalculator
 
             var grader = new SolutionGrader();
 
-            var router = new FluidRouter();
-            router.Grader = grader;
-            router.Pipe = pipe;
-            router.PipeToGround = pipeToGround;
+            var router = new FluidRouter(pipeToGround, pipe, grader);
+            
+            var belt = a.Library.Buildings.Where((b) => b.Name == "basic-transport-belt").First();
+            var beltGroundNormal = a.Library.Buildings.Where((b) => b.Name == "basic-transport-belt-to-ground").First();
+            var beltGroundFast = a.Library.Buildings.Where((b) => b.Name == "fast-transport-belt-to-ground").First();
+            var beltGroundExpress = a.Library.Buildings.Where((b) => b.Name == "express-transport-belt-to-ground").First();
+            var fastInserter = a.Library.Buildings.Where((b) => b.Name == "fast-inserter").First();
+            var inserter = a.Library.Buildings.Where((b) => b.Name == "basic-inserter").First();
+            var longInserter = a.Library.Buildings.Where((b) => b.Name == "long-handed-inserter").First();
 
-            var solid = new SolidRouter();
-            solid.Grader = grader;
-            solid.Belt = a.Library.Buildings.Where((b) => b.Name == "basic-transport-belt").First();
-            solid.BeltGroundNormal = a.Library.Buildings.Where((b) => b.Name == "basic-transport-belt-to-ground").First();
-            solid.BeltGroundFast = a.Library.Buildings.Where((b) => b.Name == "fast-transport-belt-to-ground").First();
-            solid.BeltGroundExpress = a.Library.Buildings.Where((b) => b.Name == "express-transport-belt-to-ground").First();
-            solid.FastInserter = a.Library.Buildings.Where((b) => b.Name == "fast-inserter").First();
-            solid.Inserter = a.Library.Buildings.Where((b) => b.Name == "basic-inserter").First();
-            solid.LongInserter = a.Library.Buildings.Where((b) => b.Name == "long-handed-inserter").First();
+            var solid = new SolidRouter(belt, beltGroundNormal, beltGroundFast, beltGroundExpress, inserter, longInserter, fastInserter, grader);
 
             var generator = new SolutionGenerator(result);
             generator.SolidRouter = solid;

@@ -31,7 +31,7 @@ namespace FactorioCalculator.Importer
             ModName = modName;
         }
 
-        public DirectoryInfo AppDataFolder { get { return new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FactorioCalculator")); } }
+        public static DirectoryInfo AppDataFolder { get { return new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FactorioCalculator")); } }
 
         public void Load()
         {
@@ -139,7 +139,7 @@ namespace FactorioCalculator.Importer
                             else
                             {
                                 var values = pair.Value as LuaTable;
-                                result.Fluidboxes.Add(new FluidBox(
+                                result.AddFluidBox(new FluidBox(
                                     (values["production_type"] as string).Equals("output", StringComparison.OrdinalIgnoreCase),
                                     (((values["pipe_connections"] as LuaTable)[1.0] as LuaTable)["position"] as LuaTable).ToVector2()
                                     ));
@@ -150,7 +150,8 @@ namespace FactorioCalculator.Importer
                     if (entity.ContainsKey("crafting_categories"))
                     {
                         var categories = entity["crafting_categories"] as LuaTable;
-                        result.CraftingCategories.AddRange(categories.Values.OfType<string>());
+                        foreach (var cat in categories.Values.OfType<string>())
+                            result.AddCraftingCategory(cat);
                         if (result.CraftingCategories.Contains("smelting"))
                             result.IngredientCount = 1;
                     }

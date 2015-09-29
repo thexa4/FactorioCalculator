@@ -10,7 +10,7 @@ namespace FactorioCalculator.Models.PlaceRoute
 {
     public class SolutionGrader
     {
-        public Dictionary<string, double> CostLookup = new Dictionary<string, double>(){
+        private Dictionary<string, double> CostLookup = new Dictionary<string, double>(){
             {"long-handed-inserter", 18},
             {"fast-inserter", 20},
             {"basic-inserter", 8},
@@ -19,14 +19,24 @@ namespace FactorioCalculator.Models.PlaceRoute
             //{"underground-flow", -1},
         };
 
-        public double ProductionCollisionCost = 1000;
-        public double TouchLeakCost = 50;
-        public double CollisionCost = 200;
-        public double LandUseCost = 1;
-        public double EdgeUseCost = 20;
-        public double AreaCost = 1;
+        public double ProductionCollisionCost { get; set; }
+        public double TouchLeakCost { get; set; }
+        public double CollisionCost { get; set; }
+        public double LandUseCost { get; set; }
+        public double EdgeUseCost { get; set; }
+        public double AreaCost { get; set; }
 
-        public double CostForSolution(SearchSpace state)
+        public SolutionGrader()
+        {
+            ProductionCollisionCost = 1000;
+            TouchLeakCost = 10;
+            CollisionCost = 30;
+            LandUseCost = 1;
+            EdgeUseCost = 5;
+            AreaCost = 1;
+        }
+
+        public double CostForSolution(Searchspace state)
         {
             double cost = 0;
             cost += state.Size.X * state.Size.Y * AreaCost;
@@ -45,8 +55,11 @@ namespace FactorioCalculator.Models.PlaceRoute
             return cost;
         }
 
-        public double CostForBuilding(SearchSpace state, IPhysicalBuilding building)
+        public double CostForBuilding(Searchspace state, IPhysicalBuilding building)
         {
+            if (building == null)
+                throw new ArgumentNullException("building");
+
             double cost = building.Size.X * building.Size.Y * LandUseCost;
 
             if (building.Position.X <= 0 && building.Rotation != BuildingRotation.West && building.Rotation != BuildingRotation.East)
@@ -78,9 +91,9 @@ namespace FactorioCalculator.Models.PlaceRoute
 
                 foreach (var collision in collisions)
                 {
-                    if (collision is UndergroundFlow)
+                    var flow = collision as UndergroundFlow;
+                    if (flow != null)
                     {
-                        var flow = collision as UndergroundFlow;
                         if (flow.FlowDepth != cur.FlowDepth)
                             continue;
                         if (flow.Rotation != cur.Rotation && flow.Rotation != cur.Rotation.Invert())
@@ -117,16 +130,18 @@ namespace FactorioCalculator.Models.PlaceRoute
                 var above = collisions.Where((b) => !(b is UndergroundFlow));
                 foreach (var contender in above)
                 {
-                    if (contender is ProductionBuilding)
+                    var productionContender = contender as ProductionBuilding;
+                    var flowContender = contender as FlowBuilding;
+                    if (productionContender != null)
                     {
-                        var recipe = ((ProductionBuilding)contender).Recipe;
+                        var recipe = productionContender.Recipe;
                         if (!recipe.Ingredients.Where((i) => i.Item == converted.Item.Item).Any() &&
                             !recipe.Results.Where((i) => i.Item == converted.Item.Item).Any())
                             cost += CollisionCost;
                     }
-                    else if (contender is FlowBuilding)
+                    else if (flowContender != null)
                     {
-                        if (((FlowBuilding)contender).Item.Item != converted.Item.Item)
+                        if (flowContender.Item.Item != converted.Item.Item)
                             cost += CollisionCost;
                     }
                     else

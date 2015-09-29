@@ -16,8 +16,8 @@ namespace FactorioCalculator.Models.PlaceRoute
         public Vector2 Position { get { return _position; } }
         private Vector2 _position;
 
-        public SearchSpace Space { get { return _space; } }
-        private SearchSpace _space;
+        public Searchspace Space { get { return _space; } }
+        private Searchspace _space;
 
         public Depth Depth { get { return _depth; } }
         private Depth _depth;
@@ -33,12 +33,12 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public FlowBuilding FlowBuilding { get { return _building as FlowBuilding; } }
 
-        public RoutingCoord.CoordType TransportState { get { return _transportState; } }
-        private RoutingCoord.CoordType _transportState;
+        public RoutingCoordinate.CoordinateType TransportState { get { return _transportState; } }
+        private RoutingCoordinate.CoordinateType _transportState;
 
-        public RoutingCoord RoutingCoord { get { return new RoutingCoord(_position, _transportState, _direction); } }
+        public RoutingCoordinate RoutingCoord { get { return new RoutingCoordinate(_position, _transportState, _direction); } }
 
-        public SolidRouteState(IPhysicalBuilding building, double cost, Vector2 position, SearchSpace space, RoutingCoord.CoordType transportState, Depth depth = Depth.None, BuildingRotation direction = BuildingRotation.North, int undergroundLength = 0)
+        public SolidRouteState(IPhysicalBuilding building, double cost, Vector2 position, Searchspace space, RoutingCoordinate.CoordinateType transportState, Depth depth = Depth.None, BuildingRotation direction = BuildingRotation.North, int undergroundLength = 0)
         {
             _building = building;
             _cost = cost;
@@ -50,24 +50,24 @@ namespace FactorioCalculator.Models.PlaceRoute
             _transportState = transportState;
         }
 
-        public IEnumerable<SolidRouteState> NextStates(Func<SearchSpace, IPhysicalBuilding, double> costFunction,
+        public IEnumerable<SolidRouteState> NextStates(Func<Searchspace, IPhysicalBuilding, double> costFunction,
             Building belt, Building beltGroundNormal, Building beltGroundFast,
             Building beltGroundExpress, Building inserter, Building longInserter,
             Building fastInserter)
         {
             switch (_transportState)
             {
-                case RoutingCoord.CoordType.Belt:
+                case RoutingCoordinate.CoordinateType.Belt:
                     return GenerateBeltStates(costFunction, belt)
                         .Concat(GeneratePlacedStates(costFunction))
                         .Concat(GenerateBeltToGround(costFunction, beltGroundNormal, beltGroundFast, beltGroundExpress));
-                case RoutingCoord.CoordType.Inserter:
+                case RoutingCoordinate.CoordinateType.Inserter:
                     return GeneratePlacedStates(costFunction)
                         .Concat(GenerateBeltStates(costFunction, belt))
                         .Concat(GenerateBeltToGround(costFunction, beltGroundNormal, beltGroundFast, beltGroundExpress));
-                case RoutingCoord.CoordType.PlacedItem:
+                case RoutingCoordinate.CoordinateType.PlacedItem:
                     return GenerateInserters(costFunction, inserter, longInserter, fastInserter);
-                case RoutingCoord.CoordType.Underflow:
+                case RoutingCoordinate.CoordinateType.Underflow:
                     return GenerateUnderFlow(costFunction)
                         .Concat(GenerateGroundToBelt(costFunction, beltGroundNormal, beltGroundFast, beltGroundExpress));
             }
@@ -75,49 +75,49 @@ namespace FactorioCalculator.Models.PlaceRoute
             return new SolidRouteState[] { };
         }
 
-        private IEnumerable<SolidRouteState> GeneratePlacedStates(Func<SearchSpace, IPhysicalBuilding, double> costFunction)
+        private IEnumerable<SolidRouteState> GeneratePlacedStates(Func<Searchspace, IPhysicalBuilding, double> costFunction)
         {
             var placedBuilding = new FlowBuilding(((FlowBuilding)_building).Item, new Building("placed-item"), _position, BuildingRotation.North);
             placedBuilding.Previous.Add(Building);
-            yield return new SolidRouteState(placedBuilding, _cost + costFunction(_space, placedBuilding), _position, _space.AddRoute(placedBuilding), RoutingCoord.CoordType.PlacedItem);
+            yield return new SolidRouteState(placedBuilding, _cost + costFunction(_space, placedBuilding), _position, _space.AddRoute(placedBuilding), RoutingCoordinate.CoordinateType.PlacedItem);
         }
 
-        private IEnumerable<SolidRouteState> GenerateBeltStates(Func<SearchSpace, IPhysicalBuilding, double> costFunction, Building belt)
+        private IEnumerable<SolidRouteState> GenerateBeltStates(Func<Searchspace, IPhysicalBuilding, double> costFunction, Building belt)
         {
             BuildingRotation[] rotations = new BuildingRotation[] { BuildingRotation.North, BuildingRotation.East, BuildingRotation.South, BuildingRotation.West };
-            Vector2 nextpos = _position + (_transportState == RoutingCoord.CoordType.Belt ? _direction.ToVector() : Vector2.Zero);
+            Vector2 nextpos = _position + (_transportState == RoutingCoordinate.CoordinateType.Belt ? _direction.ToVector() : Vector2.Zero);
             foreach (var rotation in rotations)
             {
                 var building = new FlowBuilding(((FlowBuilding)_building).Item, belt, nextpos, rotation);
                 building.Previous.Add(Building);
-                yield return new SolidRouteState(building, _cost + costFunction(_space, building), nextpos, _space.AddRoute(building), RoutingCoord.CoordType.Belt, Depth.None, rotation);
+                yield return new SolidRouteState(building, _cost + costFunction(_space, building), nextpos, _space.AddRoute(building), RoutingCoordinate.CoordinateType.Belt, Depth.None, rotation);
             }
         }
 
-        private IEnumerable<SolidRouteState> GenerateBeltToGround(Func<SearchSpace, IPhysicalBuilding, double> costFunction, Building groundNormal, Building groundFast, Building groundExpress)
+        private IEnumerable<SolidRouteState> GenerateBeltToGround(Func<Searchspace, IPhysicalBuilding, double> costFunction, Building groundNormal, Building groundFast, Building groundExpress)
         {
-            Vector2 nextpos = _position + (_transportState == RoutingCoord.CoordType.Belt ? _direction.ToVector() : Vector2.Zero);
+            Vector2 nextpos = _position + (_transportState == RoutingCoordinate.CoordinateType.Belt ? _direction.ToVector() : Vector2.Zero);
             var buildingNormal = new GroundToUnderground(((FlowBuilding)_building).Item, groundNormal, nextpos, _direction, Depth.Normal);
             var buildingFast = new GroundToUnderground(((FlowBuilding)_building).Item, groundFast, nextpos, _direction, Depth.Fast);
             var buildingExpress = new GroundToUnderground(((FlowBuilding)_building).Item, groundExpress, nextpos, _direction, Depth.Express);
             buildingNormal.Previous.Add(Building);
             buildingFast.Previous.Add(Building);
             buildingExpress.Previous.Add(Building);
-            yield return new SolidRouteState(buildingNormal, _cost + costFunction(_space, buildingNormal), nextpos, _space.AddRoute(buildingNormal), RoutingCoord.CoordType.Underflow, Depth.Normal, _direction);
-            yield return new SolidRouteState(buildingFast, _cost + costFunction(_space, buildingFast), nextpos, _space.AddRoute(buildingFast), RoutingCoord.CoordType.Underflow, Depth.Fast, _direction);
-            yield return new SolidRouteState(buildingExpress, _cost + costFunction(_space, buildingExpress), nextpos, _space.AddRoute(buildingExpress), RoutingCoord.CoordType.Underflow, Depth.Express, _direction);
+            yield return new SolidRouteState(buildingNormal, _cost + costFunction(_space, buildingNormal), nextpos, _space.AddRoute(buildingNormal), RoutingCoordinate.CoordinateType.Underflow, Depth.Normal, _direction);
+            yield return new SolidRouteState(buildingFast, _cost + costFunction(_space, buildingFast), nextpos, _space.AddRoute(buildingFast), RoutingCoordinate.CoordinateType.Underflow, Depth.Fast, _direction);
+            yield return new SolidRouteState(buildingExpress, _cost + costFunction(_space, buildingExpress), nextpos, _space.AddRoute(buildingExpress), RoutingCoordinate.CoordinateType.Underflow, Depth.Express, _direction);
         }
 
-        private IEnumerable<SolidRouteState> GenerateUnderFlow(Func<SearchSpace, IPhysicalBuilding, double> costFunction)
+        private IEnumerable<SolidRouteState> GenerateUnderFlow(Func<Searchspace, IPhysicalBuilding, double> costFunction)
         {
             Vector2 nextpos = _position + _direction.ToVector();
             var building = new UndergroundFlow(((FlowBuilding)_building).Item, nextpos, _depth, _direction);
             building.Previous.Add(Building);
             if (_undergroundLength < 4)
-                yield return new SolidRouteState(building, _cost + costFunction(_space, building), nextpos, _space.AddRoute(building), RoutingCoord.CoordType.Underflow, _depth, _direction, _undergroundLength + 1);
+                yield return new SolidRouteState(building, _cost + costFunction(_space, building), nextpos, _space.AddRoute(building), RoutingCoordinate.CoordinateType.Underflow, _depth, _direction, _undergroundLength + 1);
         }
 
-        private IEnumerable<SolidRouteState> GenerateGroundToBelt(Func<SearchSpace, IPhysicalBuilding, double> costFunction, Building groundNormal, Building groundFast, Building groundExpress)
+        private IEnumerable<SolidRouteState> GenerateGroundToBelt(Func<Searchspace, IPhysicalBuilding, double> costFunction, Building groundNormal, Building groundFast, Building groundExpress)
         {
             Vector2 nextpos = _position + _direction.ToVector();
             var buildingNormal = new GroundToUnderground(((FlowBuilding)_building).Item, groundNormal, nextpos, _direction, Depth.Normal);
@@ -128,14 +128,14 @@ namespace FactorioCalculator.Models.PlaceRoute
             buildingExpress.Previous.Add(Building);
             
             if (_depth == Depth.Normal)
-                yield return new SolidRouteState(buildingNormal, _cost + costFunction(_space, buildingNormal), nextpos, _space.AddRoute(buildingNormal), RoutingCoord.CoordType.Belt, Depth.None, _direction);
+                yield return new SolidRouteState(buildingNormal, _cost + costFunction(_space, buildingNormal), nextpos, _space.AddRoute(buildingNormal), RoutingCoordinate.CoordinateType.Belt, Depth.None, _direction);
             if (_depth == Depth.Fast)
-                yield return new SolidRouteState(buildingFast, _cost + costFunction(_space, buildingFast), nextpos, _space.AddRoute(buildingFast), RoutingCoord.CoordType.Belt, Depth.None, _direction);
+                yield return new SolidRouteState(buildingFast, _cost + costFunction(_space, buildingFast), nextpos, _space.AddRoute(buildingFast), RoutingCoordinate.CoordinateType.Belt, Depth.None, _direction);
             if (_depth == Depth.Express)
-                yield return new SolidRouteState(buildingExpress, _cost + costFunction(_space, buildingExpress), nextpos, _space.AddRoute(buildingExpress), RoutingCoord.CoordType.Belt, Depth.None, _direction);
+                yield return new SolidRouteState(buildingExpress, _cost + costFunction(_space, buildingExpress), nextpos, _space.AddRoute(buildingExpress), RoutingCoordinate.CoordinateType.Belt, Depth.None, _direction);
         }
 
-        private IEnumerable<SolidRouteState> GenerateInserters(Func<SearchSpace, IPhysicalBuilding, double> costFunction, Building inserter, Building longInserter, Building fastInserter)
+        private IEnumerable<SolidRouteState> GenerateInserters(Func<Searchspace, IPhysicalBuilding, double> costFunction, Building inserter, Building longInserter, Building fastInserter)
         {
             BuildingRotation[] rotations = new BuildingRotation[] { BuildingRotation.North, BuildingRotation.East, BuildingRotation.South, BuildingRotation.West };
 
@@ -150,9 +150,9 @@ namespace FactorioCalculator.Models.PlaceRoute
                 buildingLongInserter.Previous.Add(Building);
                 buildingFastInserter.Previous.Add(Building);
 
-                yield return new SolidRouteState(buildingInserter, _cost + costFunction(_space, buildingInserter), nextpos + 2 * rotation.ToVector(), _space.AddRoute(buildingInserter), RoutingCoord.CoordType.Inserter, Depth.None, BuildingRotation.North);
-                yield return new SolidRouteState(buildingLongInserter, _cost + costFunction(_space, buildingLongInserter), nextpos + 4 * rotation.ToVector(), _space.AddRoute(buildingLongInserter), RoutingCoord.CoordType.Inserter, Depth.None, BuildingRotation.North);
-                yield return new SolidRouteState(buildingFastInserter, _cost + costFunction(_space, buildingFastInserter), nextpos + 2 * rotation.ToVector(), _space.AddRoute(buildingFastInserter), RoutingCoord.CoordType.Inserter, Depth.None, BuildingRotation.North);
+                yield return new SolidRouteState(buildingInserter, _cost + costFunction(_space, buildingInserter), nextpos + 2 * rotation.ToVector(), _space.AddRoute(buildingInserter), RoutingCoordinate.CoordinateType.Inserter, Depth.None, BuildingRotation.North);
+                yield return new SolidRouteState(buildingLongInserter, _cost + costFunction(_space, buildingLongInserter), nextpos + 4 * rotation.ToVector(), _space.AddRoute(buildingLongInserter), RoutingCoordinate.CoordinateType.Inserter, Depth.None, BuildingRotation.North);
+                yield return new SolidRouteState(buildingFastInserter, _cost + costFunction(_space, buildingFastInserter), nextpos + 2 * rotation.ToVector(), _space.AddRoute(buildingFastInserter), RoutingCoordinate.CoordinateType.Inserter, Depth.None, BuildingRotation.North);
             }
         }
     }

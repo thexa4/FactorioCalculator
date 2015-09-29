@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -103,6 +104,11 @@ namespace FactorioCalculator.Models
         }
         #endregion
 
+        public double DistanceSquared()
+        {
+            return X * X + Y * Y;
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is Vector2)
@@ -120,7 +126,7 @@ namespace FactorioCalculator.Models
 
         public override string ToString()
         {
-            return string.Format("[{0}, {1}]", X, Y);
+            return string.Format(CultureInfo.InvariantCulture, "[{0}, {1}]", X, Y);
         } 
     }
 }
