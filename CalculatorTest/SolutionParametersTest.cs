@@ -11,7 +11,7 @@ namespace CalculatorTest
     public class SolutionParametersTest
     {
         [TestMethod]
-        public void TestEdges()
+        public void SolutionEdges()
         {
             for(int x = 2; x < 16; x++)
                 for(int y = 2; y < 16; y++)
@@ -32,7 +32,7 @@ namespace CalculatorTest
         }
 
         [TestMethod]
-        public void TestModify()
+        public void SolutionModify()
         {
             var item1 = new Item("a");
             var item2 = new Item("b");

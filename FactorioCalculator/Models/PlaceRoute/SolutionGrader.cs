@@ -69,7 +69,11 @@ namespace FactorioCalculator.Models.PlaceRoute
             if (building.Position.X >= state.Size.X - building.Size.X && building.Rotation != BuildingRotation.East && building.Rotation != BuildingRotation.West)
                 cost += EdgeUseCost;
             if (building.Position.Y >= state.Size.Y - building.Size.Y && building.Rotation != BuildingRotation.South && building.Rotation != BuildingRotation.North)
-                cost += EdgeUseCost; 
+                cost += EdgeUseCost;
+
+            var accountable = building as IAccountableBuilding;
+            if (accountable != null)
+                cost += accountable.CalculateCost(state, this);
 
             if (CostLookup.ContainsKey(building.Building.Name))
                 cost += CostLookup[building.Building.Name];
@@ -78,12 +82,7 @@ namespace FactorioCalculator.Models.PlaceRoute
 
             if (building is UndergroundFlow)
             {
-                var cur = building as UndergroundFlow;
-                var flows = collisions.Where((c) => c is UndergroundFlow).Cast<UndergroundFlow>().Where((f) => f.FlowDepth == cur.FlowDepth);
-                var wells = collisions.Where((c) => c is GroundToUnderground).Cast<GroundToUnderground>().Where((w) => w.FlowDepth == cur.FlowDepth);
-
-                cost += flows.Where((f) => f.Rotation == cur.Rotation || f.Rotation == cur.Rotation.Invert()).Count() * CollisionCost;
-                cost += wells.Where((f) => f.Rotation == cur.Rotation || f.Rotation == cur.Rotation.Invert()).Count() * CollisionCost;
+                
             }
             else if (building is GroundToUnderground)
             {

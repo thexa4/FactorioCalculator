@@ -12,7 +12,7 @@ namespace CalculatorTest
     public class SolidRouterTest
     {
         [TestMethod]
-        public void TestSource()
+        public void RouteSource()
         {
             SolidRouter r = new SolidRouter(
                 new Building("belt"),
@@ -56,7 +56,7 @@ namespace CalculatorTest
         }
 
         [TestMethod]
-        public void TestSink()
+        public void RouteSink()
         {
             SolidRouter r = new SolidRouter(
                 new Building("belt"),

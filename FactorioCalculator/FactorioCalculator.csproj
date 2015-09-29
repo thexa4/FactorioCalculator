@@ -126,13 +126,16 @@
     <Compile Include="Models\Factory\IPhysicalBuilding.cs" />
     <Compile Include="Models\Factory\IStep.cs" />
     <Compile Include="Models\Factory\Physical\GroundToUnderground.cs" />
-    <Compile Include="Models\Factory\Physical\UndergroundFlowStep.cs" />
+    <Compile Include="Models\Factory\Physical\PhysicalFlowBuilding.cs" />
+    <Compile Include="Models\Factory\Physical\UndergroundFlow.cs" />
     <Compile Include="Models\Factory\Physical\VirtualFlowStep.cs" />
     <Compile Include="Models\Factory\ProductionBuilding.cs" />
     <Compile Include="Models\Factory\ProductionStep.cs" />
     <Compile Include="Models\PlaceRoute\AStar.cs" />
+    <Compile Include="Models\Factory\Physical\Pipe.cs" />
     <Compile Include="Models\PlaceRoute\CollisionBox.cs" />
     <Compile Include="Models\PlaceRoute\FluidRouter.cs" />
+    <Compile Include="Models\Factory\Physical\IAccountableBuilding.cs" />
     <Compile Include="Models\PlaceRoute\IRouteState.cs" />
     <Compile Include="Models\PlaceRoute\FluidRouteState.cs" />
     <Compile Include="Models\PlaceRoute\Searchspace.cs" />

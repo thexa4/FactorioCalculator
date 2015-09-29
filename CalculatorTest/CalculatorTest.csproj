@@ -55,6 +55,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Buildings\TestGroundToUnderground.cs" />
+    <Compile Include="Buildings\TestUnderground.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SolutionParametersTest.cs" />
     <Compile Include="SolidRouterTest.cs" />
