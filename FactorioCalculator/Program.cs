@@ -46,9 +46,9 @@ namespace FactorioCalculator
             var stone = a.Library.Items.Where((i) => i.Name == "stone").First();
 
             var results = new Dictionary<String, double> {
-                {"science-pack-1", 0.01}, 
-                /*{"science-pack-2", 0.3}, 
-                {"science-pack-3", 0.3}, 
+                //{"science-pack-1", 0.01}, 
+                //{"science-pack-2", 0.01}, 
+                /*{"science-pack-3", 0.3}, 
                 {"alien-science-pack", 0.3}, 
                 {"advanced-circuit", 1}, 
                 {"lab", 1.0 / 60 / 15}, 
@@ -64,7 +64,7 @@ namespace FactorioCalculator
                 {"basic-transport-belt", 0.25}, 
                 {"fast-inserter", 1.0 / 60 / 15}, */
                 //{"basic-inserter", 1.0 / 60 / 15}, 
-                //{"iron-gear-wheel", 1.0 / 15}
+                {"iron-gear-wheel", 2.0}
                 /*{"medium-electric-pole", 1.0 / 60 / 15}, 
                 {"steel-chest", 1.0 / 60 / 15}, 
                 {"basic-mining-drill", 1.0 / 60 / 15},*/
@@ -116,8 +116,9 @@ namespace FactorioCalculator
             var fastInserter = a.Library.Buildings.Where((b) => b.Name == "fast-inserter").First();
             var inserter = a.Library.Buildings.Where((b) => b.Name == "basic-inserter").First();
             var longInserter = a.Library.Buildings.Where((b) => b.Name == "long-handed-inserter").First();
+            var splitter = a.Library.Buildings.Where((b) => b.Name == "basic-splitter").First();
 
-            var solid = new SolidRouter(belt, beltGroundNormal, beltGroundFast, beltGroundExpress, inserter, longInserter, fastInserter, grader);
+            var solid = new SolidRouter(belt, beltGroundNormal, beltGroundFast, beltGroundExpress, inserter, longInserter, fastInserter, splitter, grader);
 
             var generator = new SolutionGenerator(result);
             generator.SolidRouter = solid;

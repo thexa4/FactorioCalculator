@@ -23,6 +23,7 @@ namespace CalculatorTest
                 new Building("basic-inserter"),
                 new Building("fast-inserter"),
                 new Building("long-handed-inserter"),
+                new Building("basic-splitter"),
 
                 new SolutionGrader()
             );
@@ -67,6 +68,7 @@ namespace CalculatorTest
                 new Building("inserter1"),
                 new Building("inserter2"),
                 new Building("longInserter"),
+                new Building("basic-splitter"),
 
                 new SolutionGrader()
             );

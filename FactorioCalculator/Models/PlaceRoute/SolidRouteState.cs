@@ -53,14 +53,15 @@ namespace FactorioCalculator.Models.PlaceRoute
         public IEnumerable<SolidRouteState> NextStates(Func<Searchspace, IPhysicalBuilding, double> costFunction,
             Building belt, Building beltGroundNormal, Building beltGroundFast,
             Building beltGroundExpress, Building inserter, Building longInserter,
-            Building fastInserter)
+            Building fastInserter, Building splitter)
         {
             switch (_transportState)
             {
                 case RoutingCoordinate.CoordinateType.Belt:
                     return GenerateBeltStates(costFunction, belt)
                         .Concat(GeneratePlacedStates(costFunction))
-                        .Concat(GenerateBeltToGround(costFunction, beltGroundNormal, beltGroundFast, beltGroundExpress));
+                        .Concat(GenerateBeltToGround(costFunction, beltGroundNormal, beltGroundFast, beltGroundExpress))
+                        .Concat(GenerateSplitterStates(costFunction, splitter));
                 case RoutingCoordinate.CoordinateType.Inserter:
                     return GeneratePlacedStates(costFunction)
                         .Concat(GenerateBeltStates(costFunction, belt))
@@ -80,6 +81,41 @@ namespace FactorioCalculator.Models.PlaceRoute
             var placedBuilding = new PlacedItem(((FlowBuilding)_building).Item, _position);
             placedBuilding.Previous.Add(Building);
             yield return new SolidRouteState(placedBuilding, _cost + costFunction(_space, placedBuilding), _position, _space.AddRoute(placedBuilding), RoutingCoordinate.CoordinateType.PlacedItem);
+        }
+
+        private IEnumerable<SolidRouteState> GenerateSplitterStates(Func<Searchspace, IPhysicalBuilding, double> costFunction, Building splitter)
+        {
+            var offsets = new BuildingRotation[]{
+                            BuildingRotation.West,
+                            BuildingRotation.North,
+                            BuildingRotation.West,
+                            BuildingRotation.North,
+                        };
+            var offsetDir = offsets[(int)Direction];
+            Vector2 nextpos = _position + (_transportState == RoutingCoordinate.CoordinateType.Belt ? _direction.ToVector() : Vector2.Zero);
+
+            var endPoint1 = nextpos + offsetDir.ToVector();
+            var endPoint2 = nextpos - offsetDir.ToVector();
+
+            var target = FlowBuilding.Item.Item;
+            var dir = Direction;
+
+            var matches1 = Space.CalculateCollisions(endPoint1).OfType<Belt>().Where((b) => b.Item.Item == target && b.Rotation == dir);
+            var matches2 = Space.CalculateCollisions(endPoint2).OfType<Belt>().Where((b) => b.Item.Item == target && b.Rotation == dir);
+
+            if (matches1.Any())
+            {
+                var building = new Splitter(FlowBuilding.Item, splitter, endPoint1, Direction);
+                building.Previous.Add(Building);
+                yield return new SolidRouteState(building, _cost + costFunction(_space, building), endPoint1, _space.AddRoute(building), RoutingCoordinate.CoordinateType.Splitter);
+            }
+
+            if (matches2.Any())
+            {
+                var building = new Splitter(FlowBuilding.Item, splitter, nextpos, Direction);
+                building.Previous.Add(Building);
+                yield return new SolidRouteState(building, _cost + costFunction(_space, building), endPoint2, _space.AddRoute(building), RoutingCoordinate.CoordinateType.Splitter);
+            }
         }
 
         private IEnumerable<SolidRouteState> GenerateBeltStates(Func<Searchspace, IPhysicalBuilding, double> costFunction, Building belt)

@@ -34,6 +34,8 @@ namespace FactorioCalculator
                 await Task.Delay(1000);
                 if (_generator.BestState.Size != Vector2.Zero)
                     pictureBox1.Image = _generator.BestState.Draw();
+                if (_generator.Preview.Size != Vector2.Zero)
+                    pictureBox2.Image = _generator.Preview.Draw();
             }
         }
 

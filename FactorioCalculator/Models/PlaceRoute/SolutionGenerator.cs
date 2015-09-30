@@ -50,15 +50,15 @@ namespace FactorioCalculator.Models.PlaceRoute
         {
             for (int i = 0; i < 32; i++)
             {
-                var guess = SolutionParameters.FromFactory(_random.Next(10, 20), _random.Next(10, 20), Factory);
-                //try
+                var guess = SolutionParameters.FromFactory(_random.Next(10, 28), _random.Next(10, 28), Factory);
+                try
                 {
                     var solution = GenerateSolution(guess);
                     var cost = Grader.CostForSolution(solution);
                     return new Tuple<SolutionParameters, Searchspace, double>(guess, solution, cost);
                 }
-                //catch (InvalidOperationException) { }
-                //catch (IndexOutOfRangeException) { }
+                catch (InvalidOperationException) { }
+                catch (IndexOutOfRangeException) { }
             }
             return null;
         }
@@ -79,7 +79,7 @@ namespace FactorioCalculator.Models.PlaceRoute
                 catch (IndexOutOfRangeException) { }
                 return new Tuple<SolutionParameters, Searchspace, double>(null, new Searchspace(), -1);
             }).Where((g) => g.Item1 != null);
-            var additions = Enumerable.Range(0, 5).Select((i) => CreateRandom());
+            var additions = Enumerable.Range(0, 2).Select((i) => CreateRandom());
             var newPool = _pool.Concat(mutations).Concat(additions).OrderBy((g) => g.Item3);
             _pool = newPool.Take(10).ToList();
 
@@ -90,7 +90,9 @@ namespace FactorioCalculator.Models.PlaceRoute
 
             var iterBest = additions.Concat(mutations).OrderBy((g) => g.Item3).First();
 
-            Temperature *= 0.8;
+            Temperature *= 0.5;
+            if (Temperature < 0.02)
+                Temperature = 1;
 
             return iterBest.Item3;
         }
@@ -133,13 +135,13 @@ namespace FactorioCalculator.Models.PlaceRoute
                         {
                             sources = belts[connection.Item2];
                             destinations = BuildingToPlaceables(connection.Item1, parameters);
-                            belts[connection.Item2].AddRange(destinations);
+                            //belts[connection.Item2].AddRange(destinations);
                         }
                         else
                         {
                             sources = BuildingToPlaceables(connection.Item1, parameters);
                             destinations = belts[connection.Item2];
-                            belts[connection.Item2].AddRange(sources);
+                            //belts[connection.Item2].AddRange(sources);
                         }
 
                         result = SolidRouter.Route(new ItemAmount(connection.Item2, 1), result, sources, destinations);

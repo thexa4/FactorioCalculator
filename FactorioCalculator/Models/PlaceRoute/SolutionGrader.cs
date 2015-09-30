@@ -28,7 +28,7 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public SolutionGrader()
         {
-            ProductionCollisionCost = 1000;
+            ProductionCollisionCost = 2000;
             TouchLeakCost = 10;
             CollisionCost = 20;
             LandUseCost = 1;

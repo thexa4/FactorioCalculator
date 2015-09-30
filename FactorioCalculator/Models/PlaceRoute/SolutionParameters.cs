@@ -86,14 +86,47 @@ namespace FactorioCalculator.Models.PlaceRoute
         public SolutionParameters Modify(double temperature)
         {
             if (_random == null)
-                lock(_globalRandom)
+                lock (_globalRandom)
                     _random = new Random(_globalRandom.Next());
 
             var result = Copy();
+            if (_random.NextDouble() < temperature)
+                result.ModifySize(temperature);
+            if (_random.NextDouble() < temperature)
+                result.ModifyBuildings(temperature);
+            if (_random.NextDouble() < temperature)
+                result.ModifyEdges(temperature);
+
             result.ModifyConnections(temperature);
-            result.ModifyBuildings(temperature);
-            result.ModifyEdges(temperature);
             return result;
+        }
+
+        private void ModifySize(double temperature)
+        {
+            if (_random.NextDouble() > 0.5)
+            {
+                Width += _random.Next(-1, 2);
+                if (Width < 5)
+                    Width = 5;
+                Height += _random.Next(-1, 2);
+                if (Height < 5)
+                    Height = 5;
+            }
+            else
+            {
+                var xoff = _random.Next(-1, 2);
+                var yoff = _random.Next(-1, 2);
+
+                Width += xoff;
+                Height += yoff;
+
+                var offset = new Vector2(xoff, yoff);
+                var bounds = new Vector2(Width, Height);
+
+                SourcePositions = SourcePositions.SetItems(SourcePositions.Select((kvp) => new KeyValuePair<SourceStep, Vector2>(kvp.Key, Clamp(kvp.Value + offset, bounds))));
+                SinkPositions = SinkPositions.SetItems(SinkPositions.Select((kvp) => new KeyValuePair<SinkStep, Vector2>(kvp.Key, Clamp(kvp.Value + offset, bounds))));
+                BuildingPositions = BuildingPositions.SetItems(BuildingPositions.Select((kvp) => new KeyValuePair<ProductionStep, Tuple<Vector2, BuildingRotation>>(kvp.Key, new Tuple<Vector2, BuildingRotation>(kvp.Value.Item1 + offset, kvp.Value.Item2))));
+            }
         }
 
         private void ModifyBuildings(double temperature)
@@ -117,13 +150,13 @@ namespace FactorioCalculator.Models.PlaceRoute
 
             foreach (var sink in SinkPositions.Keys)
             {
-                var newPos = IndexToBound(BoundToIndex(SinkPositions[sink]) + (int)((2 * _random.NextDouble() - 1) * maxOffset * temperature * 16));
+                var newPos = IndexToBound(BoundToIndex(SinkPositions[sink]) + (int)((2 * _random.NextDouble() - 1) * maxOffset * temperature));
                 SinkPositions = SinkPositions.SetItem(sink, newPos);
             }
 
             foreach (var source in SourcePositions.Keys)
             {
-                var newPos = IndexToBound(BoundToIndex(SourcePositions[source]) + (int)((2 * _random.NextDouble() - 1) * maxOffset * temperature * 16));
+                var newPos = IndexToBound(BoundToIndex(SourcePositions[source]) + (int)((2 * _random.NextDouble() - 1) * maxOffset * temperature));
                 SourcePositions = SourcePositions.SetItem(source, newPos);
             }
         }

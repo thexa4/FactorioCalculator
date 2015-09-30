@@ -17,11 +17,12 @@ namespace FactorioCalculator.Models.PlaceRoute
         public Building Inserter { get; protected set; }
         public Building LongInserter { get; protected set; }
         public Building FastInserter { get; protected set; }
+        public Building Splitter { get; protected set; }
 
         public SolutionGrader Grader { get; protected set; }
 
         public SolidRouter(Building belt, Building beltGroundNormal, Building beltGroundFast, Building beltGroundExpress,
-            Building inserter, Building longInserter, Building fastInserter, SolutionGrader grader)
+            Building inserter, Building longInserter, Building fastInserter, Building splitter, SolutionGrader grader)
         {
             if (belt == null)
                 throw new ArgumentNullException("belt");
@@ -37,6 +38,8 @@ namespace FactorioCalculator.Models.PlaceRoute
                 throw new ArgumentNullException("longInserter");
             if (fastInserter == null)
                 throw new ArgumentNullException("fastInserter");
+            if (splitter == null)
+                throw new ArgumentNullException("splitter");
             if (grader == null)
                 throw new ArgumentNullException("grader");
 
@@ -47,6 +50,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             Inserter = inserter;
             LongInserter = longInserter;
             FastInserter = fastInserter;
+            Splitter = splitter;
             Grader = grader;
         }
 
@@ -66,7 +70,7 @@ namespace FactorioCalculator.Models.PlaceRoute
                 throw new ArgumentNullException("destinations");
 
             AStar<SolidRouteState> star = new AStar<SolidRouteState>();
-            star.StateGenerator = (s) => s.NextStates(Grader.CostForBuilding, Belt, BeltGroundNormal, BeltGroundFast, BeltGroundExpress, Inserter, LongInserter, FastInserter);
+            star.StateGenerator = (s) => s.NextStates(Grader.CostForBuilding, Belt, BeltGroundNormal, BeltGroundFast, BeltGroundExpress, Inserter, LongInserter, FastInserter, Splitter);
             star.EndStateValidator = ValidateEndState;
 
             foreach (var dest in destinations)
@@ -78,16 +82,34 @@ namespace FactorioCalculator.Models.PlaceRoute
                 {
                     case RoutingCoordinate.CoordinateType.Belt:
                         var startBuilding = new Belt(item, Belt, position.Position, position.Rotation);
-                        space = space.AddRoute(startBuilding);
-                        var startState = new SolidRouteState(startBuilding, 0, position.Position, space, RoutingCoordinate.CoordinateType.Belt, Depth.None, position.Rotation);
+                        var tmpSpace1 = space.AddRoute(startBuilding);
+                        var startState = new SolidRouteState(startBuilding, 0, position.Position, tmpSpace1, RoutingCoordinate.CoordinateType.Belt, Depth.None, position.Rotation);
                         star.AddState(startState);
                         break;
                     case RoutingCoordinate.CoordinateType.PlacedItem:
                     case RoutingCoordinate.CoordinateType.Inserter:
                         var startPlacedBuilding = new PlacedItem(item, position.Position);
-                        space = space.AddRoute(startPlacedBuilding);
-                        var startPlacedState = new SolidRouteState(startPlacedBuilding, 0, position.Position, space, RoutingCoordinate.CoordinateType.PlacedItem);
+                        var tmpSpace2 = space.AddRoute(startPlacedBuilding);
+                        var startPlacedState = new SolidRouteState(startPlacedBuilding, 0, position.Position, tmpSpace2, RoutingCoordinate.CoordinateType.PlacedItem);
                         star.AddState(startPlacedState);
+                        break;
+                    case RoutingCoordinate.CoordinateType.Splitter:
+                        var offsets = new BuildingRotation[]{
+                            BuildingRotation.West,
+                            BuildingRotation.North,
+                            BuildingRotation.West,
+                            BuildingRotation.North,
+                        };
+
+                        var offsetDir = offsets[(int)position.Rotation];
+                        var startSplitter1 = new Splitter(item, Splitter, position.Position, position.Rotation);
+                        var startSplitter2 = new Splitter(item, Splitter, position.Position + offsetDir.ToVector(), position.Rotation);
+                        var space1 = space.AddRoute(startSplitter1);
+                        var space2 = space.AddRoute(startSplitter2);
+                        var state1 = new SolidRouteState(startSplitter1, 0, position.Position - offsetDir.ToVector(), space1, RoutingCoordinate.CoordinateType.Belt, Depth.None, position.Rotation);
+                        var state2 = new SolidRouteState(startSplitter2, 0, position.Position + offsetDir.ToVector(), space2, RoutingCoordinate.CoordinateType.Belt, Depth.None, position.Rotation);
+                        star.AddState(state1);
+                        star.AddState(state2);
                         break;
                 }
             }
