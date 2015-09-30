@@ -1,5 +1,6 @@
 ﻿using FactorioCalculator.Models;
 using FactorioCalculator.Models.Factory;
+using FactorioCalculator.Models.Factory.Physical;
 using FactorioCalculator.Models.PlaceRoute;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Helper
 {
-    static class SearchSpaceExtensions
+    static class SearchspaceExtensions
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public static Image Draw(this Searchspace space)
@@ -26,7 +27,7 @@ namespace FactorioCalculator.Helper
                 using (var rotationPen = new Pen(Color.DarkGreen))
                 {
 
-                    foreach (var item in space.Buildings)
+                    foreach (var item in space.Buildings.Where((i) => !(i is PlacedItem)))
                     {
                         var center = (item.Position + item.Size / 2) * cellSize;
 

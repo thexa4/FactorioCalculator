@@ -103,13 +103,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="Forms\LocationSelector.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Forms\LocationSelector.Designer.cs">
+      <DependentUpon>LocationSelector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\RecipeBuilder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\RecipeBuilder.Designer.cs">
+      <DependentUpon>RecipeBuilder.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Helper\FlowBuildingExtensions.cs" />
     <Compile Include="Helper\LuaTableExtensions.cs" />
     <Compile Include="Helper\SearchSpaceExtensions.cs" />
     <Compile Include="Helper\StepExtensions.cs" />
@@ -159,13 +166,15 @@
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\ItemAmount.cs" />
     <Compile Include="Models\Factory\RecipeGraph.cs" />
-    <Compile Include="Models\RecipeLine.cs" />
     <Compile Include="Models\SubModule.cs" />
     <Compile Include="Models\Vector2.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\LocationSelector.resx">
+      <DependentUpon>LocationSelector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\RecipeBuilder.resx">
+      <DependentUpon>RecipeBuilder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

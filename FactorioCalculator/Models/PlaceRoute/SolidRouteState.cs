@@ -133,9 +133,9 @@ namespace FactorioCalculator.Models.PlaceRoute
         private IEnumerable<SolidRouteState> GenerateBeltToGround(Func<Searchspace, IPhysicalBuilding, double> costFunction, Building groundNormal, Building groundFast, Building groundExpress)
         {
             Vector2 nextpos = _position + (_transportState == RoutingCoordinate.CoordinateType.Belt ? _direction.ToVector() : Vector2.Zero);
-            var buildingNormal = new GroundToUnderground(((FlowBuilding)_building).Item, groundNormal, nextpos, _direction, Depth.Normal);
-            var buildingFast = new GroundToUnderground(((FlowBuilding)_building).Item, groundFast, nextpos, _direction, Depth.Fast);
-            var buildingExpress = new GroundToUnderground(((FlowBuilding)_building).Item, groundExpress, nextpos, _direction, Depth.Express);
+            var buildingNormal = new GroundToUnderground(((FlowBuilding)_building).Item, groundNormal, nextpos, _direction, Depth.Normal, false);
+            var buildingFast = new GroundToUnderground(((FlowBuilding)_building).Item, groundFast, nextpos, _direction, Depth.Fast, false);
+            var buildingExpress = new GroundToUnderground(((FlowBuilding)_building).Item, groundExpress, nextpos, _direction, Depth.Express, false);
             buildingNormal.Previous.Add(Building);
             buildingFast.Previous.Add(Building);
             buildingExpress.Previous.Add(Building);
@@ -156,9 +156,9 @@ namespace FactorioCalculator.Models.PlaceRoute
         private IEnumerable<SolidRouteState> GenerateGroundToBelt(Func<Searchspace, IPhysicalBuilding, double> costFunction, Building groundNormal, Building groundFast, Building groundExpress)
         {
             Vector2 nextpos = _position + _direction.ToVector();
-            var buildingNormal = new GroundToUnderground(((FlowBuilding)_building).Item, groundNormal, nextpos, _direction, Depth.Normal);
-            var buildingFast = new GroundToUnderground(((FlowBuilding)_building).Item, groundFast, nextpos, _direction, Depth.Fast);
-            var buildingExpress = new GroundToUnderground(((FlowBuilding)_building).Item, groundExpress, nextpos, _direction, Depth.Express);
+            var buildingNormal = new GroundToUnderground(((FlowBuilding)_building).Item, groundNormal, nextpos, _direction, Depth.Normal, true);
+            var buildingFast = new GroundToUnderground(((FlowBuilding)_building).Item, groundFast, nextpos, _direction, Depth.Fast, true);
+            var buildingExpress = new GroundToUnderground(((FlowBuilding)_building).Item, groundExpress, nextpos, _direction, Depth.Express, true);
             buildingNormal.Previous.Add(Building);
             buildingFast.Previous.Add(Building);
             buildingExpress.Previous.Add(Building);

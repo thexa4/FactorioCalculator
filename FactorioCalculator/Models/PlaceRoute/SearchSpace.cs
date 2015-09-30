@@ -127,6 +127,9 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public bool Equals(Searchspace other)
         {
+            if (other == null)
+                return false;
+
             if (other._size != _size)
                 return false;
 
@@ -137,16 +140,16 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public static bool operator ==(Searchspace space1, Searchspace space2)
         {
-            if (space1 == null)
-                return space2 == null;
+            if (object.ReferenceEquals(space1, null))
+                return object.ReferenceEquals(space2, null);
 
             return space1.Equals(space2);
         }
 
         public static bool operator !=(Searchspace space1, Searchspace space2)
         {
-            if (space1 == null)
-                return space2 != null;
+            if (object.ReferenceEquals(space1, null))
+                return !object.ReferenceEquals(space2, null);
 
             return !space1.Equals(space2);
         }

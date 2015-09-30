@@ -108,8 +108,23 @@ namespace FactorioCalculator.Models.PlaceRoute
                         var space2 = space.AddRoute(startSplitter2);
                         var state1 = new SolidRouteState(startSplitter1, 0, position.Position - offsetDir.ToVector(), space1, RoutingCoordinate.CoordinateType.Belt, Depth.None, position.Rotation);
                         var state2 = new SolidRouteState(startSplitter2, 0, position.Position + offsetDir.ToVector(), space2, RoutingCoordinate.CoordinateType.Belt, Depth.None, position.Rotation);
-                        star.AddState(state1);
-                        star.AddState(state2);
+                        var before = space.CalculateCollisions(position.Position - position.Rotation.ToVector()).OfType<Belt>()
+                            .Where((b) => b.Item.Item == item.Item)
+                            .Where((b) => b.Rotation == position.Rotation);
+                        var after = space.CalculateCollisions(position.Position + position.Rotation.ToVector()).OfType<Belt>()
+                            .Where((b) => b.Item.Item == item.Item)
+                            .Where((b) => b.Rotation == position.Rotation);
+
+                        if (before.Any() && after.Any())
+                        {
+                            star.AddState(state1);
+                            star.AddState(state2);
+                        }
+
+                        var startPlacedBuilding2 = new PlacedItem(item, position.Position);
+                        var tmpSpace3 = space.AddRoute(startPlacedBuilding2);
+                        var startPlacedState2 = new SolidRouteState(startPlacedBuilding2, 0, position.Position, tmpSpace3, RoutingCoordinate.CoordinateType.PlacedItem);
+                        star.AddState(startPlacedState2);
                         break;
                 }
             }
@@ -125,6 +140,10 @@ namespace FactorioCalculator.Models.PlaceRoute
                 return false;
 
             var destination = destinations.Where((d) => d.Position == state.Position).First();
+
+            if (destination.State == RoutingCoordinate.CoordinateType.Splitter &&
+                state.TransportState == RoutingCoordinate.CoordinateType.Inserter)
+                return true;
 
             if (state.TransportState != destination.State)
                 return false;

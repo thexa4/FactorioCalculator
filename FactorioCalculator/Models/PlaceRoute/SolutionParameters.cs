@@ -106,9 +106,10 @@ namespace FactorioCalculator.Models.PlaceRoute
             if (_random.NextDouble() > 0.5)
             {
                 Width += _random.Next(-1, 2);
+                Height += _random.Next(-1, 2);
+
                 if (Width < 5)
                     Width = 5;
-                Height += _random.Next(-1, 2);
                 if (Height < 5)
                     Height = 5;
             }
@@ -119,6 +120,11 @@ namespace FactorioCalculator.Models.PlaceRoute
 
                 Width += xoff;
                 Height += yoff;
+
+                if (Width < 5)
+                    Width = 5;
+                if (Height < 5)
+                    Height = 5;
 
                 var offset = new Vector2(xoff, yoff);
                 var bounds = new Vector2(Width, Height);

@@ -11,15 +11,21 @@ namespace FactorioCalculator.Helper
 {
     public static class StepExtensions
     {
-        public static void PrintDot(this IEnumerable<IStep> list)
+        public static IEnumerable<string> AsDot(this IEnumerable<IStep> list)
         {
             if (list == null)
                 throw new ArgumentNullException("list");
-            Console.WriteLine("digraph production {");
+            yield return "digraph production {";
             foreach (var step in list)
                 foreach (var prev in step.Previous)
-                    Console.WriteLine(String.Format(CultureInfo.InvariantCulture, "\"{0}\" -> \"{1}\";", prev, step));
-            Console.WriteLine("}");
+                    yield return String.Format(CultureInfo.InvariantCulture, "\"{0}\" -> \"{1}\";", prev, step);
+            yield return "}";
+        }
+
+        public static void PrintDot(this IEnumerable<IStep> list)
+        {
+            foreach (var line in list.AsDot())
+                Console.WriteLine(line);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace FactorioCalculator.Models.PlaceRoute
         public AStar(double distanceCost = 5)
         {
             DistanceCost = distanceCost;
-            _queue = new HeapPriorityQueue<AStarState>(500 * 1000);
+            _queue = new HeapPriorityQueue<AStarState>(1500 * 1000);
         }
 
         public void AddDestination(RoutingCoordinate position)
@@ -55,6 +55,7 @@ namespace FactorioCalculator.Models.PlaceRoute
                 var last = _queue.Skip((int)(_queue.MaxSize * 0.9)).ToList();
                 foreach (var item in last)
                     _queue.Remove(item);
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
                 Console.WriteLine("done");
             }
         }

@@ -21,7 +21,7 @@ namespace CalculatorTest.Buildings
             lib.AddItem(item);
             lib.Initialize();
 
-            var flow = new GroundToUnderground(new ItemAmount(item, 1), new Building("test0"), Vector2.One, BuildingRotation.South, Depth.Normal);
+            var flow = new GroundToUnderground(new ItemAmount(item, 1), new Building("test0"), Vector2.One, BuildingRotation.South, Depth.Normal, false);
             var grader = new SolutionGrader();
 
             var space = new Searchspace(new Vector2(4, 4));
