@@ -15,14 +15,14 @@ namespace CalculatorTest
         public void RouteSource()
         {
             SolidRouter r = new SolidRouter(
-                new Building("belt"),
-                new Building("beltground3"),
-                new Building("beltground2"),
-                new Building("beltground1"),
+                new Building("basic-transport-belt"),
+                new Building("basic-transport-belt-to-ground"),
+                new Building("fast-transport-belt-to-ground"),
+                new Building("express-transport-belt-to-ground"),
 
-                new Building("inserter1"),
-                new Building("inserter2"),
-                new Building("longInserter"),
+                new Building("basic-inserter"),
+                new Building("fast-inserter"),
+                new Building("long-handed-inserter"),
 
                 new SolutionGrader()
             );

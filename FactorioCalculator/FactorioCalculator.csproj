@@ -125,8 +125,10 @@
     <Compile Include="Models\Factory\FlowStep.cs" />
     <Compile Include="Models\Factory\IPhysicalBuilding.cs" />
     <Compile Include="Models\Factory\IStep.cs" />
+    <Compile Include="Models\Factory\Physical\Belt.cs" />
     <Compile Include="Models\Factory\Physical\GroundToUnderground.cs" />
     <Compile Include="Models\Factory\Physical\PhysicalFlowBuilding.cs" />
+    <Compile Include="Models\Factory\Physical\PlacedItem.cs" />
     <Compile Include="Models\Factory\Physical\UndergroundFlow.cs" />
     <Compile Include="Models\Factory\Physical\VirtualFlowStep.cs" />
     <Compile Include="Models\Factory\ProductionBuilding.cs" />

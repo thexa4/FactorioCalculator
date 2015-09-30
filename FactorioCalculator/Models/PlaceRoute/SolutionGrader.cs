@@ -30,7 +30,7 @@ namespace FactorioCalculator.Models.PlaceRoute
         {
             ProductionCollisionCost = 1000;
             TouchLeakCost = 10;
-            CollisionCost = 30;
+            CollisionCost = 20;
             LandUseCost = 1;
             EdgeUseCost = 5;
             AreaCost = 1;
@@ -77,83 +77,6 @@ namespace FactorioCalculator.Models.PlaceRoute
 
             if (CostLookup.ContainsKey(building.Building.Name))
                 cost += CostLookup[building.Building.Name];
-
-            var collisions = state.CalculateCollisions(building.Position, building.Size).Where((b) => b != building);
-
-            if (building is UndergroundFlow)
-            {
-                
-            }
-            else if (building is GroundToUnderground)
-            {
-                var cur = building as GroundToUnderground;
-
-                foreach (var collision in collisions)
-                {
-                    var flow = collision as UndergroundFlow;
-                    if (flow != null)
-                    {
-                        if (flow.FlowDepth != cur.FlowDepth)
-                            continue;
-                        if (flow.Rotation != cur.Rotation && flow.Rotation != cur.Rotation.Invert())
-                            continue;
-                        cost += CollisionCost;
-                    }
-                    else
-                    {
-                        cost += CollisionCost;
-                    }
-                }
-            }
-            else if (building.Building.Name == "pipe")
-            {
-                var above = collisions.Where((b) => !(b is UndergroundFlow));
-                cost += above.Count() * CollisionCost;
-
-                var pipeBuilding = (FlowBuilding)building;
-
-                BuildingRotation[] rotations = new BuildingRotation[] { BuildingRotation.North, BuildingRotation.East, BuildingRotation.South, BuildingRotation.West };
-                foreach (var rotation in rotations)
-                {
-                    var neighbors = state.CalculateCollisions(building.Position + rotation.ToVector());
-                    var misMatch = neighbors.Where((b) => b.Building.Name == "pipe" && b is FlowBuilding).Cast<FlowBuilding>()
-                        .Where((f) => f.Item.Item != pipeBuilding.Item.Item);
-
-
-                    cost += misMatch.Count() * TouchLeakCost;
-                }
-            }
-            else if (building.Building.Name == "placed-item")
-            {
-                var converted = building as FlowBuilding;
-                var above = collisions.Where((b) => !(b is UndergroundFlow));
-                foreach (var contender in above)
-                {
-                    var productionContender = contender as ProductionBuilding;
-                    var flowContender = contender as FlowBuilding;
-                    if (productionContender != null)
-                    {
-                        var recipe = productionContender.Recipe;
-                        if (!recipe.Ingredients.Where((i) => i.Item == converted.Item.Item).Any() &&
-                            !recipe.Results.Where((i) => i.Item == converted.Item.Item).Any())
-                            cost += CollisionCost;
-                    }
-                    else if (flowContender != null)
-                    {
-                        if (flowContender.Item.Item != converted.Item.Item)
-                            cost += CollisionCost;
-                    }
-                    else
-                    {
-                        cost += CollisionCost;
-                    }
-                }
-            }
-            else
-            {
-                var above = collisions.Where((b) => !(b is UndergroundFlow));
-                cost += above.Count() * CollisionCost;
-            }
 
             return cost;
         }

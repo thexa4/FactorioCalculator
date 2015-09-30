@@ -51,21 +51,21 @@ namespace FactorioCalculator.Models.PlaceRoute
             for (int i = 0; i < 32; i++)
             {
                 var guess = SolutionParameters.FromFactory(_random.Next(10, 20), _random.Next(10, 20), Factory);
-                try
+                //try
                 {
                     var solution = GenerateSolution(guess);
                     var cost = Grader.CostForSolution(solution);
                     return new Tuple<SolutionParameters, Searchspace, double>(guess, solution, cost);
                 }
-                catch (InvalidOperationException) { }
-                catch (IndexOutOfRangeException) { }
+                //catch (InvalidOperationException) { }
+                //catch (IndexOutOfRangeException) { }
             }
             return null;
         }
 
         public double Step()
         {
-            var mutations = _pool.AsParallel().Select((parent) =>
+            var mutations = _pool.Select((parent) =>
             {
                 try
                 {
@@ -79,7 +79,7 @@ namespace FactorioCalculator.Models.PlaceRoute
                 catch (IndexOutOfRangeException) { }
                 return new Tuple<SolutionParameters, Searchspace, double>(null, new Searchspace(), -1);
             }).Where((g) => g.Item1 != null);
-            var additions = Enumerable.Range(0, 5).AsParallel().Select((i) => CreateRandom());
+            var additions = Enumerable.Range(0, 5).Select((i) => CreateRandom());
             var newPool = _pool.Concat(mutations).Concat(additions).OrderBy((g) => g.Item3);
             _pool = newPool.Take(10).ToList();
 

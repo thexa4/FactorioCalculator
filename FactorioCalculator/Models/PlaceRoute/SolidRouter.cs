@@ -77,14 +77,14 @@ namespace FactorioCalculator.Models.PlaceRoute
                 switch (position.State)
                 {
                     case RoutingCoordinate.CoordinateType.Belt:
-                        var startBuilding = new FlowBuilding(item, Belt, position.Position, position.Rotation);
+                        var startBuilding = new Belt(item, Belt, position.Position, position.Rotation);
                         space = space.AddRoute(startBuilding);
                         var startState = new SolidRouteState(startBuilding, 0, position.Position, space, RoutingCoordinate.CoordinateType.Belt, Depth.None, position.Rotation);
                         star.AddState(startState);
                         break;
                     case RoutingCoordinate.CoordinateType.PlacedItem:
                     case RoutingCoordinate.CoordinateType.Inserter:
-                        var startPlacedBuilding = new FlowBuilding(item, new Building("placed-item"), position.Position, BuildingRotation.North);
+                        var startPlacedBuilding = new PlacedItem(item, position.Position);
                         space = space.AddRoute(startPlacedBuilding);
                         var startPlacedState = new SolidRouteState(startPlacedBuilding, 0, position.Position, space, RoutingCoordinate.CoordinateType.PlacedItem);
                         star.AddState(startPlacedState);

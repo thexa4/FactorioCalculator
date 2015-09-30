@@ -9,13 +9,15 @@ using System.Threading.Tasks;
 
 namespace FactorioCalculator.Models.PlaceRoute
 {
-    public struct Searchspace
+    public class Searchspace
     {
         public ImmutableList<CollisionBox<ProductionBuilding>> Components { get { return _components; } }
         public ImmutableList<CollisionBox<FlowBuilding>> Routes { get { return _routes; } }
 
         private ImmutableList<CollisionBox<ProductionBuilding>> _components;
         private ImmutableList<CollisionBox<FlowBuilding>> _routes;
+
+        private ImmutableHashSet<IPhysicalBuilding>[,] _grid;
 
         public IEnumerable<IPhysicalBuilding> Buildings { get { return Components.Select((c) => c.Step as IPhysicalBuilding).Concat(Routes.Select((c) => c.Step as IPhysicalBuilding)); } }
 
@@ -24,21 +26,58 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         public Searchspace(Vector2 size) : this(size, ImmutableList<CollisionBox<ProductionBuilding>>.Empty, ImmutableList<CollisionBox<FlowBuilding>>.Empty) { }
 
-        public Searchspace(Vector2 size, ImmutableList<CollisionBox<ProductionBuilding>> components, ImmutableList<CollisionBox<FlowBuilding>> routes)
+        public Searchspace(Vector2 size, ImmutableList<CollisionBox<ProductionBuilding>> components, ImmutableList<CollisionBox<FlowBuilding>> routes, ImmutableHashSet<IPhysicalBuilding>[,] grid = null)
         {
             _size = size;
             _components = components;
             _routes = routes;
+
+            _grid = new ImmutableHashSet<IPhysicalBuilding>[(int)_size.X, (int)_size.Y];
+            if (grid == null)
+            {
+                
+                for (int x = 0; x < _size.X; x++)
+                    for (int y = 0; y < _size.Y; y++)
+                        _grid[x, y] = ImmutableHashSet<IPhysicalBuilding>.Empty;
+            }
+            else
+            {
+                _grid = (ImmutableHashSet<IPhysicalBuilding>[,])grid.Clone();
+            }
         }
+
+        public Searchspace() { }
 
         public Searchspace AddComponent(ProductionBuilding building)
         {
-            return new Searchspace(Size, _components.Add(new CollisionBox<ProductionBuilding>(building)), _routes);
+            var result = new Searchspace(Size, _components.Add(new CollisionBox<ProductionBuilding>(building)), _routes, _grid);
+
+            for (int x = 0; x < building.Size.X; x++)
+                for (int y = 0; y < building.Size.Y; y++)
+                {
+                    var xpos = x + (int)building.Position.X;
+                    var ypos = y + (int)building.Position.Y;
+                    if (xpos < Size.X && ypos < Size.Y)
+                        result._grid[xpos, ypos] = _grid[xpos, ypos].Add(building);
+                }
+
+            return result;
         }
 
         public Searchspace AddRoute(FlowBuilding building)
         {
-            return new Searchspace(Size, _components, _routes.Add(new CollisionBox<FlowBuilding>(building)));
+            var result = new Searchspace(Size, _components, _routes.Add(new CollisionBox<FlowBuilding>(building)), _grid);
+            
+            for (int x = 0; x < building.Size.X; x++)
+                for (int y = 0; y < building.Size.Y; y++)
+                {
+                    var xpos = x + (int)building.Position.X;
+                    var ypos = y + (int)building.Position.Y;
+                    if (xpos >= 0 && ypos >= 0 && xpos < Size.X && ypos < Size.Y)
+                        result._grid[xpos, ypos] = _grid[xpos, ypos].Add(building);
+                }
+
+            return result;
         }
 
         public IEnumerable<IPhysicalBuilding> CalculateCollisions(Vector2 position)
@@ -47,15 +86,19 @@ namespace FactorioCalculator.Models.PlaceRoute
         }
 
         public IEnumerable<IPhysicalBuilding> CalculateCollisions(Vector2 position, Vector2 size) {
-            RectangleF source = new RectangleF((float)position.X, (float)position.Y, (float)size.X, (float)size.Y);
-            foreach (var building in Buildings)
-            {
-                RectangleF test = new RectangleF((float)building.Position.X, (float)building.Position.Y,
-                    (float)building.Size.X, (float)building.Size.Y);
+            HashSet<IPhysicalBuilding> result = new HashSet<IPhysicalBuilding>();
 
-                if (source.IntersectsWith(test))
-                    yield return building;
-            }
+            for (int x = 0; x < size.X; x++)
+                for (int y = 0; y < size.Y; y++)
+                {
+                    var xpos = x + (int)position.X;
+                    var ypos = y + (int)position.Y;
+                    if (xpos >= 0 && ypos >= 0 && xpos < Size.X && ypos < Size.Y)
+                        foreach (var building in _grid[xpos, ypos])
+                            result.Add(building);
+                }
+
+            return result;
         }
 
         public bool IsValidSinkSourcePosition(Vector2 position)

@@ -77,7 +77,7 @@ namespace FactorioCalculator.Models.PlaceRoute
 
         private IEnumerable<SolidRouteState> GeneratePlacedStates(Func<Searchspace, IPhysicalBuilding, double> costFunction)
         {
-            var placedBuilding = new FlowBuilding(((FlowBuilding)_building).Item, new Building("placed-item"), _position, BuildingRotation.North);
+            var placedBuilding = new PlacedItem(((FlowBuilding)_building).Item, _position);
             placedBuilding.Previous.Add(Building);
             yield return new SolidRouteState(placedBuilding, _cost + costFunction(_space, placedBuilding), _position, _space.AddRoute(placedBuilding), RoutingCoordinate.CoordinateType.PlacedItem);
         }
@@ -88,7 +88,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             Vector2 nextpos = _position + (_transportState == RoutingCoordinate.CoordinateType.Belt ? _direction.ToVector() : Vector2.Zero);
             foreach (var rotation in rotations)
             {
-                var building = new FlowBuilding(((FlowBuilding)_building).Item, belt, nextpos, rotation);
+                var building = new Belt(((FlowBuilding)_building).Item, belt, nextpos, rotation);
                 building.Previous.Add(Building);
                 yield return new SolidRouteState(building, _cost + costFunction(_space, building), nextpos, _space.AddRoute(building), RoutingCoordinate.CoordinateType.Belt, Depth.None, rotation);
             }
@@ -142,9 +142,9 @@ namespace FactorioCalculator.Models.PlaceRoute
             foreach (var rotation in rotations)
             {
                 Vector2 nextpos = _position;
-                var buildingInserter = new FlowBuilding(((FlowBuilding)_building).Item, inserter, nextpos + rotation.ToVector(), rotation);
-                var buildingLongInserter = new FlowBuilding(((FlowBuilding)_building).Item, longInserter, nextpos + 2 * rotation.ToVector(), rotation);
-                var buildingFastInserter = new FlowBuilding(((FlowBuilding)_building).Item, fastInserter, nextpos + rotation.ToVector(), rotation);
+                var buildingInserter = new PhysicalFlowBuilding(((FlowBuilding)_building).Item, inserter, nextpos + rotation.ToVector(), rotation);
+                var buildingLongInserter = new PhysicalFlowBuilding(((FlowBuilding)_building).Item, longInserter, nextpos + 2 * rotation.ToVector(), rotation);
+                var buildingFastInserter = new PhysicalFlowBuilding(((FlowBuilding)_building).Item, fastInserter, nextpos + rotation.ToVector(), rotation);
 
                 buildingInserter.Previous.Add(Building);
                 buildingLongInserter.Previous.Add(Building);

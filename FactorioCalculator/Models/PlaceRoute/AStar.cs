@@ -17,10 +17,12 @@ namespace FactorioCalculator.Models.PlaceRoute
         public Func<T, IEnumerable<T>> StateGenerator { get; set; }
         public Func<T, HashSet<RoutingCoordinate>, bool> EndStateValidator { get; set; }
 
+        private int _purgeCount = 0;
+
         public AStar(double distanceCost = 5)
         {
             DistanceCost = distanceCost;
-            _queue = new HeapPriorityQueue<AStarState>(300 * 1000);
+            _queue = new HeapPriorityQueue<AStarState>(2000 * 1000);
         }
 
         public void AddDestination(RoutingCoordinate position)
@@ -40,6 +42,20 @@ namespace FactorioCalculator.Models.PlaceRoute
             {
                 var guessedCost = newState.Cost + CostHeuristic(newState.Position);
                 _queue.Enqueue(new AStarState(newState), guessedCost);
+            }
+
+            // Out of memory, purge worst 15%
+            if (_queue.Count > _queue.MaxSize - 100)
+            {
+                _purgeCount++;
+                if (_purgeCount > 10)
+                    throw new IndexOutOfRangeException("Unable to find solution in time");
+                Console.WriteLine(string.Format("Out of memory, purging AStar queue... {0}", _purgeCount));
+                
+                var last = _queue.Skip((int)(_queue.MaxSize * 0.9)).ToList();
+                foreach (var item in last)
+                    _queue.Remove(item);
+                Console.WriteLine("done");
             }
         }
 
