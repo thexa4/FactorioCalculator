@@ -109,63 +109,27 @@
     <Compile Include="Forms\LocationSelector.Designer.cs">
       <DependentUpon>LocationSelector.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\RecipeBuilder.cs">
+    <Compile Include="Forms\TreeViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\RecipeBuilder.Designer.cs">
-      <DependentUpon>RecipeBuilder.cs</DependentUpon>
+    <Compile Include="Forms\TreeViewer.Designer.cs">
+      <DependentUpon>TreeViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Helper\FlowBuildingExtensions.cs" />
     <Compile Include="Helper\LuaTableExtensions.cs" />
-    <Compile Include="Helper\SearchSpaceExtensions.cs" />
-    <Compile Include="Helper\StepExtensions.cs" />
     <Compile Include="Helper\TopologicalSort.cs" />
-    <Compile Include="Helper\TrivialSolutionFactory.cs" />
     <Compile Include="Helper\VectorExtensions.cs" />
     <Compile Include="Importer\ModImporter.cs" />
     <Compile Include="Models\Building.cs" />
     <Compile Include="Models\BuildingRotation.cs" />
     <Compile Include="Models\Depth.cs" />
     <Compile Include="Models\EnergySource.cs" />
-    <Compile Include="Models\Factory\FlowBuilding.cs" />
-    <Compile Include="Models\Factory\FlowStep.cs" />
-    <Compile Include="Models\Factory\IPhysicalBuilding.cs" />
-    <Compile Include="Models\Factory\IStep.cs" />
-    <Compile Include="Models\Factory\Physical\Belt.cs" />
-    <Compile Include="Models\Factory\Physical\GroundToUnderground.cs" />
-    <Compile Include="Models\Factory\Physical\PhysicalFlowBuilding.cs" />
-    <Compile Include="Models\Factory\Physical\PlacedItem.cs" />
-    <Compile Include="Models\Factory\Physical\Splitter.cs" />
-    <Compile Include="Models\Factory\Physical\UndergroundFlow.cs" />
-    <Compile Include="Models\Factory\Physical\VirtualFlowStep.cs" />
-    <Compile Include="Models\Factory\ProductionBuilding.cs" />
-    <Compile Include="Models\Factory\ProductionStep.cs" />
-    <Compile Include="Models\PlaceRoute\AStar.cs" />
-    <Compile Include="Models\Factory\Physical\Pipe.cs" />
-    <Compile Include="Models\PlaceRoute\CollisionBox.cs" />
-    <Compile Include="Models\PlaceRoute\FluidRouter.cs" />
-    <Compile Include="Models\Factory\Physical\IAccountableBuilding.cs" />
-    <Compile Include="Models\PlaceRoute\IRouteState.cs" />
-    <Compile Include="Models\PlaceRoute\FluidRouteState.cs" />
-    <Compile Include="Models\PlaceRoute\Searchspace.cs" />
-    <Compile Include="Models\Factory\SinkStep.cs" />
-    <Compile Include="Models\Factory\SourceStep.cs" />
-    <Compile Include="Models\Factory\TransformStep.cs" />
-    <Compile Include="Models\Factory\Step.cs" />
     <Compile Include="Models\FluidBox.cs" />
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\ItemType.cs" />
     <Compile Include="Models\Library.cs" />
-    <Compile Include="Models\PlaceRoute\RoutingCoordinate.cs" />
-    <Compile Include="Models\PlaceRoute\SolidRouter.cs" />
-    <Compile Include="Models\PlaceRoute\SolidRouteState.cs" />
-    <Compile Include="Models\PlaceRoute\SolutionGenerator.cs" />
-    <Compile Include="Models\PlaceRoute\SolutionGrader.cs" />
-    <Compile Include="Models\PlaceRoute\SolutionParameters.cs" />
     <Compile Include="Models\Recipe.cs" />
     <Compile Include="Models\ItemAmount.cs" />
-    <Compile Include="Models\Factory\RecipeGraph.cs" />
     <Compile Include="Models\SubModule.cs" />
     <Compile Include="Models\Vector2.cs" />
     <Compile Include="Program.cs" />
@@ -173,8 +137,8 @@
     <EmbeddedResource Include="Forms\LocationSelector.resx">
       <DependentUpon>LocationSelector.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\RecipeBuilder.resx">
-      <DependentUpon>RecipeBuilder.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\TreeViewer.resx">
+      <DependentUpon>TreeViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

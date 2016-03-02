@@ -20,8 +20,8 @@ namespace FactorioCalculator.Models
         /// The Y value of the coordinate
         /// </summary>
         public double Y { get { return _y; } }
-        private double _x;
-        private double _y;
+        private readonly double _x;
+        private readonly double _y;
 
         public static readonly Vector2 One = new Vector2(1, 1);
         public static readonly Vector2 Zero = new Vector2(0, 0);

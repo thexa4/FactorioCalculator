@@ -2,13 +2,7 @@
 using FactorioCalculator.Models;
 using FactorioCalculator.Properties;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -17,47 +11,57 @@ namespace FactorioCalculator.Forms
     public partial class LocationSelector : Form
     {
         private Library _library;
-        private bool _exiting = true;
-        private bool _starting = true;
-        private object _lockObject = new object();
+
+        private static string FactorioPathPath
+        {
+            get { return Path.Combine(ModImporter.AppDataFolder.FullName, "factorio_path.txt"); }
+        }
 
         public LocationSelector()
         {
             InitializeComponent();
 
-            locationInput.Text = Settings.Default.FactorioLocation;
-            _starting = false;
-
-            UpdateLocation();
+            locationInput.Text = DefaultLocation();
         }
 
-        private void browseButton_Click(object sender, EventArgs e)
+        private static string DefaultLocation()
         {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
-            dialog.RootFolder = Environment.SpecialFolder.ProgramFiles;
-            dialog.SelectedPath = locationInput.Text;
+            if (File.Exists(FactorioPathPath))
+            {
+                var p = File.ReadAllText(FactorioPathPath);
+                if (Directory.Exists(p))
+                    return p;
+            }
+
+            return Settings.Default.FactorioLocation;
+        }
+
+        private async void browseButton_Click(object sender, EventArgs e)
+        {
+            var dialog = new FolderBrowserDialog {
+                SelectedPath = locationInput.Text
+            };
 
             var result = dialog.ShowDialog();
 
-            if (result == System.Windows.Forms.DialogResult.OK)
+            if (result == DialogResult.OK)
             {
                 locationInput.Text = dialog.SelectedPath;
-                UpdateLocation();
+                _library = await LoadLibrary(dialog.SelectedPath);
+
+                File.WriteAllText(FactorioPathPath, dialog.SelectedPath);
             }
         }
 
-        private async Task UpdateLocation()
+        private async Task<Library> LoadLibrary(string path)
         {
-            if (_starting)
-                return;
-
             continueButton.Enabled = false;
 
-            var versioninfo = new FileInfo(Path.Combine(locationInput.Text, "data", "changelog.txt"));
+            var versioninfo = new FileInfo(Path.Combine(path, "data", "changelog.txt"));
             if (!versioninfo.Exists)
             {
-                statusLabel.Text = "Factorio not found at specified location";
-                return;
+                statusLabel.Text = Resources.LocationSelector_LoadLibrary_FactorioNotFound;
+                return null;
             }
 
             browseButton.Enabled = false;
@@ -67,44 +71,36 @@ namespace FactorioCalculator.Forms
             file.ReadLine();
             var version = file.ReadLine();
 
-            statusLabel.Text = string.Format("Found Factorio: [{0}], loading...", version);
-            ModImporter importer = new ModImporter(locationInput.Text);
-            await Task.Run(() =>
-            {
-                importer.Load();
-            });
-            _library = importer.Library;
+            statusLabel.Text = string.Format(Resources.LocationSelector_LoadLibrary_FactorioFound_Loading, version);
+            var importer = new ModImporter(path);
 
-            statusLabel.Text = string.Format("Found Factorio: [{0}], loaded.", version);
+            await Task.Run((Action)importer.Load);
+
+            statusLabel.Text = string.Format(Resources.LocationSelector_LoadLibrary_FactorioFound_Loaded, version);
             continueButton.Enabled = true;
             browseButton.Enabled = true;
             locationInput.Enabled = true;
             continueButton.Focus();
+
+            return importer.Library;
         }
 
-        private void locationInput_TextChanged(object sender, EventArgs e)
+        private async void continueButton_Click(object sender, EventArgs e)
         {
-            UpdateLocation();
-        }
+            if (_library == null)
+                _library = await LoadLibrary(locationInput.Text);
 
-        private void continueButton_Click(object sender, EventArgs e)
-        {
             if (_library != null)
             {
-                if (electricityCheckbox.CheckState == CheckState.Checked)
-                    _library.AddPowerPseudoItems();
-
-                var next = new RecipeBuilder(_library);
+                var next = new TreeViewer(_library);
                 next.Show();
-                _exiting = false;
-                this.Close();
+                Hide();
             }
         }
 
         private void LocationSelector_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if(_exiting)
-                Application.Exit();
+            Application.Exit();
         }
     }
 }

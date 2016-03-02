@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace FactorioCalculator.Models
@@ -14,8 +11,8 @@ namespace FactorioCalculator.Models
         public IEnumerable<ItemAmount> Ingredients { get { return _ingredients; } }
         public IEnumerable<ItemAmount> Results { get { return _results; } }
 
-        private List<ItemAmount> _ingredients = new List<ItemAmount>();
-        private List<ItemAmount> _results = new List<ItemAmount>();
+        private readonly List<ItemAmount> _ingredients = new List<ItemAmount>();
+        private readonly List<ItemAmount> _results = new List<ItemAmount>();
 
         public double Time { get; set; }
 
