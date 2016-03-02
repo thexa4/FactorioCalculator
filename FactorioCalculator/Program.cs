@@ -15,8 +15,11 @@ namespace FactorioCalculator
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            new LocationSelector().Show();
-            Application.Run();
+            using (var s = new LocationSelector())
+            {
+                s.Show();
+                Application.Run();
+            }
         }
     }
 }

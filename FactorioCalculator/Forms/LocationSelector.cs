@@ -92,11 +92,7 @@ namespace FactorioCalculator.Forms
 
             if (_library != null)
             {
-                if (electricityCheckbox.CheckState == CheckState.Checked)
-                    _library.AddPowerPseudoItems();
-
                 var next = new TreeViewer(_library);
-                //var next = new RecipeBuilder(_library);
                 next.Show();
                 Hide();
             }

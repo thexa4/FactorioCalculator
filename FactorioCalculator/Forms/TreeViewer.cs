@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -49,9 +50,9 @@ namespace FactorioCalculator.Forms
             var totals = new ConcurrentDictionary<Item, double>();
 
             RecipeTreeView.Nodes.Clear();
-            RecipeTreeView.Nodes.AddRange(ToTreeNodes(item, 1, totals));
+            RecipeTreeView.Nodes.Add(ToTreeNode(item, 1, totals));
             foreach (var node in RecipeTreeView.Nodes)
-                ((TreeNode)node).ExpandAll();
+                ((TreeNode)node).Expand();
 
             foreach (var res in totals)
                 TotalsDisplay.Items.Add(string.Format("{0} ({1})", res.Key.Name, res.Value));
@@ -59,30 +60,40 @@ namespace FactorioCalculator.Forms
 
         private IEnumerable<TreeNode> ToTreeNodes(Recipe recipe, double amount, ConcurrentDictionary<Item, double> totals)
         {
-            var node = new TreeNode(string.Format("{0} ({1})", recipe.Name, amount));
+            var node = new TreeNode(string.Format(CultureInfo.CurrentCulture, "{0} ({1})", recipe.Name, amount));
 
             foreach (var ingredient in recipe.Ingredients)
-                node.Nodes.AddRange(ToTreeNodes(ingredient.Item, ingredient.Amount * amount, totals));
+                node.Nodes.Add(ToTreeNode(ingredient.Item, ingredient.Amount * amount, totals));
 
             return new[] { node };
         }
 
-        private TreeNode[] ToTreeNodes(Item item, double amount, ConcurrentDictionary<Item, double> totals)
+        private TreeNode ToTreeNode(Item item, double amount, ConcurrentDictionary<Item, double> totals)
         {
             if (item.IsResource)
             {
                 totals.AddOrUpdate(item, amount, (_, b) => b + amount);
 
-                return new[] {
-                    new TreeNode(string.Format("{0} - ({1})", item.Name, amount)),
-                };
+                return new TreeNode(string.Format(CultureInfo.CurrentCulture, "{0} - ({1})", item.Name, amount));
             }
             else
             {
-                return (from recipe in item.Recipes
-                        let amt = recipe.Results.Single(a => a.Item == item).Amount
-                        from node in ToTreeNodes(recipe, amount / amt, totals)
-                        select node).ToArray();
+                var recipes = (from recipe in item.Recipes
+                               let produced = recipe.Results.Single(a => a.Item == item).Amount
+                               from n in ToTreeNodes(recipe, amount / produced, totals)
+                               select n).ToArray();
+
+                if (recipes.Length == 1)
+                    return recipes.Single();
+
+                var node = new TreeNode(string.Format(CultureInfo.CurrentCulture, "{0} Recipes for \"{1}\"", item.Recipes.Count(), item.Name));
+                node.Nodes.AddRange(
+                    (from recipe in item.Recipes
+                     let produced = recipe.Results.Single(a => a.Item == item).Amount
+                     from n in ToTreeNodes(recipe, amount / produced, totals)
+                     select n).ToArray()
+                );
+                return node;
             }
         }
     }
