@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace FactorioCalculator.Models
 {
@@ -14,7 +10,7 @@ namespace FactorioCalculator.Models
         public double Amount { get; protected set; }
         public Item Item
         {
-            get { return _library.Items.Where((i) => i.Name == _itemName).First(); }
+            get { return _library.Items.First(i => i.Name == _itemName); }
         }
 
         private readonly string _itemName;
@@ -175,7 +171,7 @@ namespace FactorioCalculator.Models
         public override bool Equals(object obj)
         {
             var amount = obj as ItemAmount;
-            if (object.ReferenceEquals(amount, null))
+            if (ReferenceEquals(amount, null))
                 return false;
 
             return Equals(amount);
@@ -183,7 +179,7 @@ namespace FactorioCalculator.Models
 
         public bool Equals(ItemAmount other)
         {
-            if (object.ReferenceEquals(other, null))
+            if (ReferenceEquals(other, null))
                 return false;
 
             return other._itemName == _itemName &&
@@ -192,16 +188,16 @@ namespace FactorioCalculator.Models
 
         public static bool operator ==(ItemAmount box1, ItemAmount box2)
         {
-            if (object.ReferenceEquals(box1, null))
-                return object.ReferenceEquals(box2, null);
+            if (ReferenceEquals(box1, null))
+                return ReferenceEquals(box2, null);
 
             return box1.Equals(box2);
         }
 
         public static bool operator !=(ItemAmount box1, ItemAmount box2)
         {
-            if (object.ReferenceEquals(box1, null))
-                return !object.ReferenceEquals(box2, null);
+            if (ReferenceEquals(box1, null))
+                return !ReferenceEquals(box2, null);
 
             return !box1.Equals(box2);
         }

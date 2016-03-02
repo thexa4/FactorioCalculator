@@ -1,11 +1,6 @@
-﻿using FactorioCalculator.Models.Factory;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace FactorioCalculator.Models
 {
@@ -16,12 +11,10 @@ namespace FactorioCalculator.Models
         public IEnumerable<Building> Buildings { get { return _buildings; } }
         public IEnumerable<Recipe> Recipes { get { return _recipes; } }
 
-        private List<Item> _items = new List<Item>();
-        private List<Building> _buildings = new List<Building>();
-        private List<Recipe> _recipes = new List<Recipe>();
+        private readonly List<Item> _items = new List<Item>();
+        private readonly List<Building> _buildings = new List<Building>();
+        private readonly List<Recipe> _recipes = new List<Recipe>();
 
-        public Dictionary<Item, RecipeGraph> BestRecipe { get; private set; }
-        
         public void Initialize()
         {
             foreach (var i in _items)
@@ -30,8 +23,6 @@ namespace FactorioCalculator.Models
                 b.Initialize(this);
             foreach (var r in _recipes)
                 r.Initialize(this);
-
-            BestRecipe = new Dictionary<Item, RecipeGraph>();
         }
 
         public void AddPowerPseudoItems()
