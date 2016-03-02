@@ -52,7 +52,6 @@
             this.locationInput.Name = "locationInput";
             this.locationInput.Size = new System.Drawing.Size(474, 22);
             this.locationInput.TabIndex = 1;
-            this.locationInput.TextChanged += new System.EventHandler(this.locationInput_TextChanged);
             // 
             // browseButton
             // 
