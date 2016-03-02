@@ -34,7 +34,6 @@ namespace FactorioCalculator.Forms
         private void browseButton_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog dialog = new FolderBrowserDialog();
-            dialog.RootFolder = Environment.SpecialFolder.ProgramFiles;
             dialog.SelectedPath = locationInput.Text;
 
             var result = dialog.ShowDialog();
