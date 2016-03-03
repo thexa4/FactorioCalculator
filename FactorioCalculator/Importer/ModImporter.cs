@@ -139,9 +139,10 @@ namespace FactorioCalculator.Importer
                             else
                             {
                                 var values = pair.Value as LuaTable;
+                                var center = (result.Size - Vector2.One) / 2;
                                 result.AddFluidBox(new FluidBox(
                                     (values["production_type"] as string).Equals("output", StringComparison.OrdinalIgnoreCase),
-                                    (((values["pipe_connections"] as LuaTable)[1.0] as LuaTable)["position"] as LuaTable).ToVector2()
+                                    (((values["pipe_connections"] as LuaTable)[1.0] as LuaTable)["position"] as LuaTable).ToVector2() + center
                                     ));
                             }
                         }

@@ -16,6 +16,14 @@ namespace FactorioCalculator.Models.Factory
         public BuildingRotation Rotation { get; protected set; }
         public Building Building { get; protected set; }
 
+        public IEnumerable<FluidBox> FluidBoxes
+        {
+            get
+            {
+                return Building.FluidBoxes.Select((f) => new FluidBox(f.IsOutput, (f.Position - Building.Size / 2).Rotate(Rotation) + Size / 2));
+            }
+        }
+
         public FlowBuilding(ItemAmount item, Building building, Vector2 position, BuildingRotation rotation)
             : base(item)
         {

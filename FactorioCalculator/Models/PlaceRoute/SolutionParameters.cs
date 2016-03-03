@@ -1,4 +1,5 @@
-﻿using FactorioCalculator.Models.Factory;
+﻿using FactorioCalculator.Helper;
+using FactorioCalculator.Models.Factory;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -129,8 +130,8 @@ namespace FactorioCalculator.Models.PlaceRoute
                 var offset = new Vector2(xoff, yoff);
                 var bounds = new Vector2(Width, Height);
 
-                SourcePositions = SourcePositions.SetItems(SourcePositions.Select((kvp) => new KeyValuePair<SourceStep, Vector2>(kvp.Key, Clamp(kvp.Value + offset, bounds))));
-                SinkPositions = SinkPositions.SetItems(SinkPositions.Select((kvp) => new KeyValuePair<SinkStep, Vector2>(kvp.Key, Clamp(kvp.Value + offset, bounds))));
+                SourcePositions = SourcePositions.SetItems(SourcePositions.Select((kvp) => new KeyValuePair<SourceStep, Vector2>(kvp.Key, VectorExtensions.Clamp(kvp.Value + offset, bounds))));
+                SinkPositions = SinkPositions.SetItems(SinkPositions.Select((kvp) => new KeyValuePair<SinkStep, Vector2>(kvp.Key, VectorExtensions.Clamp(kvp.Value + offset, bounds))));
                 BuildingPositions = BuildingPositions.SetItems(BuildingPositions.Select((kvp) => new KeyValuePair<ProductionStep, Tuple<Vector2, BuildingRotation>>(kvp.Key, new Tuple<Vector2, BuildingRotation>(kvp.Value.Item1 + offset, kvp.Value.Item2))));
             }
         }
@@ -144,7 +145,7 @@ namespace FactorioCalculator.Models.PlaceRoute
                 var xOffset = Math.Floor((2 * _random.NextDouble() - 1) * maxOffset * temperature);
                 var yOffset = Math.Floor((2 * _random.NextDouble() - 1) * maxOffset * temperature);
 
-                var newPos = Reflect(BuildingPositions[building].Item1 + new Vector2(xOffset, yOffset), new Vector2(Width, Height) - building.Building.Size);
+                var newPos = VectorExtensions.Reflect(BuildingPositions[building].Item1 + new Vector2(xOffset, yOffset), new Vector2(Width, Height) - building.Building.Size);
                 var newRot = ((int)BuildingPositions[building].Item2 + (2 * _random.NextDouble() - 1) * temperature * 32 + 64) % 4;
                 BuildingPositions = BuildingPositions.SetItem(building, new Tuple<Vector2, BuildingRotation>(newPos, (BuildingRotation)((int)newRot)));
             }
@@ -165,31 +166,6 @@ namespace FactorioCalculator.Models.PlaceRoute
                 var newPos = IndexToBound(BoundToIndex(SourcePositions[source]) + (int)((2 * _random.NextDouble() - 1) * maxOffset * temperature));
                 SourcePositions = SourcePositions.SetItem(source, newPos);
             }
-        }
-
-        public static Vector2 Clamp(Vector2 input, Vector2 bound)
-        {
-            var x = input.X;
-            var y = input.Y;
-
-            if (x < 0)
-                x = 0;
-            if (y < 0)
-                y = 0;
-
-            if (x > bound.X)
-                x = bound.X;
-            if (y > bound.Y)
-                y = bound.Y;
-
-            return new Vector2(x, y);
-        }
-
-        public static Vector2 Reflect(Vector2 input, Vector2 bound)
-        {
-            var clipped = Clamp(input, bound);
-            var diff = input - clipped;
-            return Clamp(clipped - diff, bound);
         }
 
         private static double Nfmod(double a, double b)

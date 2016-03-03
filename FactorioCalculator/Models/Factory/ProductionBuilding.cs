@@ -17,13 +17,14 @@ namespace FactorioCalculator.Models.Factory
         {
             get
             {
-                IEnumerable<FluidBox> result = new FluidBox[]{};
+                IEnumerable<FluidBox> filtered = new FluidBox[]{};
                 var inputs = Building.FluidBoxes.Where((b) => b.IsOutput == false);
                 var outputs = Building.FluidBoxes.Where((b) => b.IsOutput == true);
                 if (!Building.HidesFluidBox || Recipe.Ingredients.Where((i) => i.Item.ItemType == ItemType.Fluid).Any())
-                    result = result.Concat(inputs);
+                    filtered = filtered.Concat(inputs);
                 if (!Building.HidesFluidBox || Recipe.Results.Where((i) => i.Item.ItemType == ItemType.Fluid).Any())
-                    result = result.Concat(outputs);
+                    filtered = filtered.Concat(outputs);
+                var result = filtered.Select((b) => new FluidBox(b.IsOutput, (b.Position - (Size - Vector2.One) / 2).Rotate(Rotation) + (Size - Vector2.One) / 2));
                 return result;
             }
         }

@@ -67,6 +67,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             Inserter,
             Underflow,
             Pipe,
+            PipeToGround,
             Splitter,
         }
     }

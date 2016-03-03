@@ -29,7 +29,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             Grader = grader;
         }
 
-        public Searchspace Route(ItemAmount item, Searchspace space, Vector2 position, BuildingRotation rotation, IEnumerable<RoutingCoordinate> destinations)
+        public Searchspace Route(ItemAmount item, Searchspace space, IEnumerable<RoutingCoordinate> sources, IEnumerable<RoutingCoordinate> destinations)
         {
             if (item == null)
                 throw new ArgumentNullException("item");
@@ -41,11 +41,14 @@ namespace FactorioCalculator.Models.PlaceRoute
             star.EndStateValidator = ValidateEndState;
 
             foreach (var dest in destinations)
-                star.AddDestination(dest);
+                star.AddDestination(new RoutingCoordinate(dest.Position, dest.State, dest.Rotation.Invert()));
 
-            var startBuilding = new VirtualFlowStep(item, PipeToGround, position, rotation.Invert());
-            var startState = new FluidRouteState(startBuilding, 0, position, space, Depth.None, rotation, true);
-            star.AddState(startState);
+            foreach (var source in sources)
+            {
+                var startBuilding = new VirtualFlowStep(item, PipeToGround, source.Position, source.Rotation.Invert());
+                var startState = new FluidRouteState(startBuilding, 0, source.Position, space, Depth.None, source.Rotation, true);
+                star.AddState(startState);
+            }
 
             while (!star.Step()) { }
 

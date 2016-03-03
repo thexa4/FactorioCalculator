@@ -55,6 +55,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Buildings\TestProductionBuilding.cs" />
     <Compile Include="Buildings\TestGroundToUnderground.cs" />
     <Compile Include="Buildings\TestUnderground.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

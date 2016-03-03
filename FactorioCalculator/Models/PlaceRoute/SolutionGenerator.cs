@@ -1,5 +1,6 @@
 ﻿using FactorioCalculator.Models.Factory;
 using FactorioCalculator.Models.Factory.Physical;
+using FactorioCalculator.Helper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -135,13 +136,11 @@ namespace FactorioCalculator.Models.PlaceRoute
                         {
                             sources = belts[connection.Item2];
                             destinations = BuildingToPlaceables(connection.Item1, parameters);
-                            //belts[connection.Item2].AddRange(destinations);
                         }
                         else
                         {
                             sources = BuildingToPlaceables(connection.Item1, parameters);
                             destinations = belts[connection.Item2];
-                            //belts[connection.Item2].AddRange(sources);
                         }
 
                         result = SolidRouter.Route(new ItemAmount(connection.Item2, 1), result, sources, destinations);
@@ -156,10 +155,19 @@ namespace FactorioCalculator.Models.PlaceRoute
                     var source = both.Where((c) => c.Item3 == false).First();
                     var destination = both.Where((c) => c.Item3 == true).First();
 
-                    var sources = BuildingToPlaceables(source.Item1, parameters);
-                    var destinations = BuildingToPlaceables(destination.Item1, parameters);
+                    if (connection.Item2.ItemType == ItemType.Solid)
+                    {
+                        var sources = BuildingToPlaceables(source.Item1, parameters);
+                        var destinations = BuildingToPlaceables(destination.Item1, parameters);
+                        result = SolidRouter.Route(new ItemAmount(connection.Item2, 1), result, sources, destinations);
+                    }
 
-                    result = SolidRouter.Route(new ItemAmount(connection.Item2, 1), result, sources, destinations);
+                    if (connection.Item2.ItemType == ItemType.Fluid)
+                    {
+                        var sources = BuildingToPipes(source.Item1, parameters, connection.Item2);
+                        var destinations = BuildingToPipes(destination.Item1, parameters, connection.Item2);
+                        result = FluidRouter.Route(new ItemAmount(connection.Item2, 1), result, sources, destinations);
+                    }
                 }
 
                 if (!belts.ContainsKey(connection.Item2))
@@ -175,8 +183,63 @@ namespace FactorioCalculator.Models.PlaceRoute
             var newRoutes = now.Routes.Skip(previous.Routes.Count);
             foreach (var route in newRoutes)
             {
-                if (route.Step.Building.Name.EndsWith("-transport-belt"))
+                if (route.Step is Belt)
                     yield return new RoutingCoordinate(route.Position, RoutingCoordinate.CoordinateType.Splitter, route.Step.Rotation);
+            }
+        }
+
+        public static IEnumerable<RoutingCoordinate> BuildingToPipes(IStep step, SolutionParameters parameters, Item item)
+        {
+            var sourceStep = step as SourceStep;
+            if (sourceStep != null)
+            {
+                var pos = parameters.SourcePositions[sourceStep];
+                var rotation = InwardDirectionForEdge(pos, new Vector2(parameters.Width, parameters.Height));
+                yield return new RoutingCoordinate(pos, RoutingCoordinate.CoordinateType.PipeToGround, rotation);
+            }
+
+            var sinkStep = step as SinkStep;
+            if (sinkStep != null)
+            {
+                var pos = parameters.SinkPositions[sinkStep];
+                var rotation = InwardDirectionForEdge(pos, new Vector2(parameters.Width, parameters.Height));
+                yield return new RoutingCoordinate(pos, RoutingCoordinate.CoordinateType.PipeToGround, rotation);
+            }
+
+            var productionStep = step as ProductionStep;
+            if (productionStep != null)
+            {
+                List<FluidBox> boxes;
+                List<ItemAmount> items;
+                var productionBuilding = new ProductionBuilding(productionStep.Recipe, productionStep.Amount, productionStep.Building,
+                    parameters.BuildingPositions[productionStep].Item1, parameters.BuildingPositions[productionStep].Item2);
+
+                if (productionStep.Recipe.Ingredients.Where((i) => i.Item == item).Any())
+                {
+                    boxes = productionBuilding.FluidBoxes.Where((b) => !b.IsOutput).ToList();
+                    items = productionBuilding.Recipe.Ingredients.ToList();
+                }
+                else
+                {
+                    boxes = productionBuilding.FluidBoxes.Where((b) => b.IsOutput).ToList();
+                    items = productionBuilding.Recipe.Results.ToList();
+                }
+                for (int i = 0; i < boxes.Count; i++)
+                {
+                    var matchingIngredient = items[Math.Min(i, items.Count - 1)];
+                    if (matchingIngredient.Item != item)
+                        continue;
+
+                    var box = boxes[i];
+
+                    for (int d = 0; d < 4; d++)
+                    {
+                        var dir = (BuildingRotation)d;
+                        var offsetDir = box.Position + dir.ToVector();
+                        if (offsetDir.Clamp(productionBuilding.Size - Vector2.One) == offsetDir)
+                            yield return new RoutingCoordinate(offsetDir + productionBuilding.Position, RoutingCoordinate.CoordinateType.PipeToGround, dir.Invert());
+                    }
+                }
             }
         }
 
@@ -195,7 +258,7 @@ namespace FactorioCalculator.Models.PlaceRoute
             if (step is SourceStep)
             {
                 var pos = parameters.SourcePositions[step as SourceStep];
-                var rotation = InwardVectorForEdge(pos, new Vector2(parameters.Width, parameters.Height));
+                var rotation = InwardDirectionForEdge(pos, new Vector2(parameters.Width, parameters.Height));
                 yield return new RoutingCoordinate(pos, RoutingCoordinate.CoordinateType.Belt, rotation);
                 yield break;
             }
@@ -203,13 +266,13 @@ namespace FactorioCalculator.Models.PlaceRoute
             if (step is SinkStep)
             {
                 var pos = parameters.SinkPositions[step as SinkStep];
-                var rotation = InwardVectorForEdge(pos, new Vector2(parameters.Width, parameters.Height)).Invert();
+                var rotation = InwardDirectionForEdge(pos, new Vector2(parameters.Width, parameters.Height)).Invert();
                 yield return new RoutingCoordinate(pos, RoutingCoordinate.CoordinateType.Belt, rotation);
                 yield break;
             }
         }
 
-        private static BuildingRotation InwardVectorForEdge(Vector2 position, Vector2 size)
+        private static BuildingRotation InwardDirectionForEdge(Vector2 position, Vector2 size)
         {
             if (position.X == 0)
                 return BuildingRotation.East;
