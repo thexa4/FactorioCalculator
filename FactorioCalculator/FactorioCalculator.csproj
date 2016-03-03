@@ -148,7 +148,7 @@
     <Compile Include="Models\Factory\Physical\IAccountableBuilding.cs" />
     <Compile Include="Models\PlaceRoute\IRouteState.cs" />
     <Compile Include="Models\PlaceRoute\FluidRouteState.cs" />
-    <Compile Include="Models\PlaceRoute\Searchspace.cs" />
+    <Compile Include="Models\PlaceRoute\SearchSpace.cs" />
     <Compile Include="Models\Factory\SinkStep.cs" />
     <Compile Include="Models\Factory\SourceStep.cs" />
     <Compile Include="Models\Factory\TransformStep.cs" />
