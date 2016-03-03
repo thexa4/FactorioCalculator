@@ -59,6 +59,7 @@ namespace FactorioCalculator.Forms
             if (!versioninfo.Exists)
             {
                 statusLabel.Text = Resources.LocationSelector_LoadLibrary_FactorioNotFound;
+                continueButton.Enabled = true;
                 return null;
             }
 
