@@ -48,8 +48,6 @@ namespace FactorioCalculator.Forms
             {
                 locationInput.Text = dialog.SelectedPath;
                 _library = await LoadLibrary(dialog.SelectedPath);
-
-                File.WriteAllText(FactorioPathPath, dialog.SelectedPath);
             }
         }
 
@@ -70,6 +68,8 @@ namespace FactorioCalculator.Forms
             var file = versioninfo.OpenText();
             file.ReadLine();
             var version = file.ReadLine();
+
+            File.WriteAllText(FactorioPathPath, path);
 
             statusLabel.Text = string.Format(Resources.LocationSelector_LoadLibrary_FactorioFound_Loading, version);
             var importer = new ModImporter(path);
